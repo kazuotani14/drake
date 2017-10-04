@@ -2,7 +2,7 @@
 // Spong, Mark W. "Swing up control of the acrobot." Robotics and Automation,
 // 1994. Proceedings., 1994 IEEE International Conference on. IEEE, 1994.
 // The structure of this controller follows
-// PendulumEnergyShapingController in pendulum_run_energy_shaping.cc
+// PendulumEnergyShapingController in pendulum/energy_shaping_simulation.cc
 
 #pragma once
 
