@@ -10,9 +10,10 @@ USER_ROOT="$(pwd)"
 docker run \
 	-i \
 	-p 8888:8888          \
-   	-w /home/icubuser          \
+   	-w /          \
 	--privileged=true \
 	--net=host \
+	--volume=/home/kazu/icub/drake-distro:/drake-distro:rw\
 	--volume=/tmp/.X11-unix:/tmp/.X11-unix:rw \
 	--volume=/tmp/.docker.xauth:/tmp/.docker.xauth:rw \
 	--volume=/dev/bus/usb:/dev/bus/usb:rw \
@@ -22,7 +23,7 @@ docker run \
 	--env="USER_GID=${USER_GID}" \
 	--env="DISPLAY=${DISPLAY}" \
 	-e QT_X11_NO_MITSHM=1\
-	--name=drake_w_viz \
+	--name=drake_kazu1 \
 	-t drake bash \
 
 export containerId='docker ps -l -q'
