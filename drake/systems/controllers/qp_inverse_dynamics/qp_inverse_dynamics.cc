@@ -63,7 +63,8 @@ void QpInverseDynamics::SetTempMatricesToZero() {
 
 QpInverseDynamics::QpInverseDynamics() {
   if (!solver_.available()) {
-    throw std::runtime_error("Gurobi solver not available.");
+    // throw std::runtime_error("Gurobi solver not available.");
+    throw std::runtime_error("Mosek solver not available.");
   }
 }
 
@@ -392,6 +393,7 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
   // equality constraints:
   //  M_u * vd + h_u = (J^T * basis)_u * Beta (equations of motion)
   //  J * vd + Jd * v = 0, (contact constraints)
+  //  where _u means upper 6 floating-base rows of these matrices (?)
   // inEquality: joint torque limit, limits on Beta, etc.
   // cost func:
   //  min (Jcom*vd + Jcomd*v - desired_comdd)^2
@@ -401,6 +403,7 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
   // I made the dynamics and stationary contact equality constraints.
   // Alternatively, they can be set up as high weight cost terms. This is
   // sometimes preferred as it introduce slacks for better stability.
+  // TODO update above to reflet that contact is soft constraint now
   //
   // For more details on the QP formulation, please refer to:
   // [1] An efficiently solvable quadratic program for stabilizing dynamic
@@ -430,21 +433,6 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
   DRAKE_ASSERT(rowIdx == num_point_force_ * 3);
   DRAKE_ASSERT(colIdx == num_basis_);
 
-  // TODO(siyuan.feng): This is assuming all the unactuated joints are at the
-  // top. Need to lift the assumption.
-  // tau = M_l * vd + h_l - (J^T * basis)_l * Beta
-  // tau = torque_linear_ * X + torque_constant_
-  for (int i = 0; i < num_vd_; ++i) {
-    torque_linear_.block(0, prog_->FindDecisionVariableIndex(vd_(i)),
-                         num_torque_, 1) =
-        rs.get_M().bottomRows(num_torque_).col(i);
-  }
-  for (int i = 0; i < num_basis_; ++i) {
-    torque_linear_.block(0, prog_->FindDecisionVariableIndex(basis_(i)),
-                         num_torque_, 1) = -JB_.bottomRows(num_torque_).col(i);
-  }
-  torque_constant_ = rs.get_bias_term().tail(num_torque_);
-
   ////////////////////////////////////////////////////////////////////
   // Equality constraints:
   // Equations of motion part, 6 rows
@@ -464,6 +452,10 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
   }
 
   // Contact constraints, 3 rows per contact point
+  // Soft contact constraint is formulated as:
+  // accel_contact + (Kd * vel_contact) = 0 (eqn 12 in [1], without slack)
+  // accel_c = J_c * vd + Jd * v
+  // minimize || J_c * vd + Jd * v + Kd * J_c * v ||^2
   rowIdx = 0;
   int cost_ctr = 0, eq_ctr = 0;
   for (const auto& contact_pair : input.contact_information()) {
@@ -511,6 +503,22 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
   // since B should be orthonormal.
   // Tau is joint space indexed, and u is actuator space indexed.
   // constraints are specified with u index.
+
+  // TODO(siyuan.feng): This is assuming all the unactuated joints are at the
+  // top. Need to lift the assumption.
+  // tau = M_l * vd + h_l - (J^T * basis)_l * Beta
+  // tau = torque_linear_ * X + torque_constant_
+  for (int i = 0; i < num_vd_; ++i) {
+    torque_linear_.block(0, prog_->FindDecisionVariableIndex(vd_(i)),
+                         num_torque_, 1) =
+        rs.get_M().bottomRows(num_torque_).col(i);
+  }
+  for (int i = 0; i < num_basis_; ++i) {
+    torque_linear_.block(0, prog_->FindDecisionVariableIndex(basis_(i)),
+                         num_torque_, 1) = -JB_.bottomRows(num_torque_).col(i);
+  }
+  torque_constant_ = rs.get_bias_term().tail(num_torque_);
+
   inequality_linear_ =
       robot.B.bottomRows(num_torque_).transpose() * torque_linear_;
   inequality_upper_bound_ = inequality_lower_bound_ =
@@ -598,7 +606,7 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
     eq_dof_motion_->UpdateCoefficients(tmp_vd_mat_.topRows(row_ctr),
                                        tmp_vd_vec_.head(row_ctr));
   }
-  // Procecss cost terms.
+  // Process cost terms.
   if (row_idx_as_cost.size() > 0) {
     tmp_vd_mat_.setZero();
     tmp_vd_vec_.setZero();

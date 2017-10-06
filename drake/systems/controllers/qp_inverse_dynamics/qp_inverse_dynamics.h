@@ -9,6 +9,7 @@
 
 #include "drake/common/eigen_types.h"
 #include "drake/solvers/gurobi_solver.h"
+#include "drake/solvers/mosek_solver.h"
 #include "drake/solvers/mathematical_program.h"
 #include "drake/systems/controllers/qp_inverse_dynamics/qp_inverse_dynamics_common.h"
 #include "drake/systems/controllers/qp_inverse_dynamics/robot_kinematic_state.h"
@@ -116,13 +117,13 @@ class QpInverseDynamics {
   // prog_ is only allocated in ResizeQP, Control only updates the appropriate
   // matrices / vectors.
   std::unique_ptr<drake::solvers::MathematicalProgram> prog_;
-  drake::solvers::GurobiSolver solver_;
+  // drake::solvers::GurobiSolver solver_;
+  drake::solvers::MosekSolver solver_;
   drake::solvers::VectorXDecisionVariable basis_;
   drake::solvers::VectorXDecisionVariable vd_;
 
   // pointers to different cost / constraint terms inside prog_
   drake::solvers::LinearEqualityConstraint* eq_dynamics_{nullptr};
-  // TODO(siyuan.feng): Switch to cost for contact_constraints
   std::vector<drake::solvers::LinearEqualityConstraint*> eq_contacts_;
   std::vector<drake::solvers::LinearEqualityConstraint*> eq_body_motion_;
   drake::solvers::LinearEqualityConstraint* eq_dof_motion_{nullptr};
