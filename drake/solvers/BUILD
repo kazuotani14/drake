@@ -458,7 +458,10 @@ drake_cc_library(
             "no_mosek.cc",
         ],
     }),
-    hdrs = ["mosek_solver.h"],
+    hdrs = [
+        "mathprog_analysis.h",
+        "mosek_solver.h",
+    ],
     deps = select({
         "//tools:with_mosek": [
             ":mathematical_program_api",
