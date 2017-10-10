@@ -4,14 +4,13 @@
 <!-- |    EDITING THIS FILE BY HAND IS NOT RECOMMENDED                                 | -->
 <!-- =================================================================================== -->
 <robot name="human" xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <!-- From now on, nothing should be changed in the file -->
-  --&gt;
 
   <!-- Materials -->
   <material name="blue">
     <color rgba="0 0 0.8 1"/>
   </material>
 
+  <!-- Links -->
   <link name="base_link">
     <inertial>
       <mass value="0.001"/>
@@ -796,7 +795,7 @@
     <origin rpy="1.57079632679 0 0" xyz="0 0 0"/>
   </joint>
   <!-- Back joints -->
-  <joint name="jL5S1_Z" type="revolute">
+  <joint name="jL5S1_Z" type="continuous">
     <parent link="Pelvis"/>
     <child link="body_L5_1"/>
     <axis xyz="0 0 1"/>
@@ -804,7 +803,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jL5S1_X" type="revolute">
+  <joint name="jL5S1_X" type="continuous">
     <parent link="body_L5_1"/>
     <child link="body_L5_2"/>
     <axis xyz="1 0 0"/>
@@ -812,7 +811,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jL5S1_Y" type="revolute">
+  <joint name="jL5S1_Y" type="continuous">
     <parent link="body_L5_2"/>
     <child link="L5"/>
     <axis xyz="0 1 0"/>
@@ -820,7 +819,14 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jL4L3_Z" type="revolute">
+
+  <transmission type="SimpleTransmission" name="Pelvis_L5">
+    <actuator name="Pelvis_L5" />
+    <joint name="jL5S1_Y" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+
+  <joint name="jL4L3_Z" type="continuous">
     <parent link="L5"/>
     <child link="body_L3_1"/>
     <axis xyz="0 0 1"/>
@@ -828,7 +834,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jL4L3_X" type="revolute">
+  <joint name="jL4L3_X" type="continuous">
     <parent link="body_L3_1"/>
     <child link="body_L3_2"/>
     <axis xyz="1 0 0"/>
@@ -836,7 +842,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jL4L3_Y" type="revolute">
+  <joint name="jL4L3_Y" type="continuous">
     <parent link="body_L3_2"/>
     <child link="L3"/>
     <axis xyz="0 1 0"/>
@@ -844,7 +850,13 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jL1T12_Z" type="revolute">
+  <transmission type="SimpleTransmission" name="L5_L3">
+    <actuator name="L5_L3" />
+    <joint name="jL4L3_Y" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+
+  <joint name="jL1T12_Z" type="continuous">
     <parent link="L3"/>
     <child link="body_T12_1"/>
     <axis xyz="0 0 1"/>
@@ -852,7 +864,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jL1T12_X" type="revolute">
+  <joint name="jL1T12_X" type="continuous">
     <parent link="body_T12_1"/>
     <child link="body_T12_2"/>
     <axis xyz="1 0 0"/>
@@ -860,7 +872,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jL1T12_Y" type="revolute">
+  <joint name="jL1T12_Y" type="continuous">
     <parent link="body_T12_2"/>
     <child link="T12"/>
     <axis xyz="0 1 0"/>
@@ -868,7 +880,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jT9T8_Z" type="revolute">
+  <joint name="jT9T8_Z" type="continuous">
     <parent link="T12"/>
     <child link="body_T8_1"/>
     <axis xyz="0 0 1"/>
@@ -876,7 +888,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jT9T8_X" type="revolute">
+  <joint name="jT9T8_X" type="continuous">
     <parent link="body_T8_1"/>
     <child link="body_T8_2"/>
     <axis xyz="1 0 0"/>
@@ -884,7 +896,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jT9T8_Y" type="revolute">
+  <joint name="jT9T8_Y" type="continuous">
     <parent link="body_T8_2"/>
     <child link="T8"/>
     <axis xyz="0 1 0"/>
@@ -892,7 +904,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jT1C7_Z" type="revolute">
+  <joint name="jT1C7_Z" type="continuous">
     <parent link="T8"/>
     <child link="body_Neck_1"/>
     <axis xyz="0 0 1"/>
@@ -900,7 +912,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jT1C7_X" type="revolute">
+  <joint name="jT1C7_X" type="continuous">
     <parent link="body_Neck_1"/>
     <child link="body_Neck_2"/>
     <axis xyz="1 0 0"/>
@@ -908,7 +920,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jT1C7_Y" type="revolute">
+  <joint name="jT1C7_Y" type="continuous">
     <parent link="body_Neck_2"/>
     <child link="Neck"/>
     <axis xyz="0 1 0"/>
@@ -916,7 +928,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jC1Head_Z" type="revolute">
+  <joint name="jC1Head_Z" type="continuous">
     <parent link="Neck"/>
     <child link="body_Head_1"/>
     <axis xyz="0 0 1"/>
@@ -924,7 +936,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jC1Head_X" type="revolute">
+  <joint name="jC1Head_X" type="continuous">
     <parent link="body_Head_1"/>
     <child link="body_Head_2"/>
     <axis xyz="1 0 0"/>
@@ -932,7 +944,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jC1Head_Y" type="revolute">
+  <joint name="jC1Head_Y" type="continuous">
     <parent link="body_Head_2"/>
     <child link="Head"/>
     <axis xyz="0 1 0"/>
@@ -941,7 +953,7 @@
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
   <!-- Right arm joints -->
-  <joint name="jRightC7Shoulder_Z" type="revolute">
+  <joint name="jRightC7Shoulder_Z" type="continuous">
     <parent link="T8"/>
     <child link="body_RightShoulder_1"/>
     <axis xyz="0 0 1"/>
@@ -949,7 +961,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightC7Shoulder_X" type="revolute">
+  <joint name="jRightC7Shoulder_X" type="continuous">
     <parent link="body_RightShoulder_1"/>
     <child link="body_RightShoulder_2"/>
     <axis xyz="1 0 0"/>
@@ -957,7 +969,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightC7Shoulder_Y" type="revolute">
+  <joint name="jRightC7Shoulder_Y" type="continuous">
     <parent link="body_RightShoulder_2"/>
     <child link="Right Shoulder"/>
     <axis xyz="0 1 0"/>
@@ -965,7 +977,13 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightShoulder_Z" type="revolute">
+  <transmission type="SimpleTransmission" name="T8_RightShoulder">
+    <actuator name="T8_RightShoulder" />
+    <joint name="jRightC7Shoulder_Y" />
+    <mechanicalReduction>1</mechanicalReduction>
+  </transmission>
+
+  <joint name="jRightShoulder_Z" type="continuous">
     <parent link="Right Shoulder"/>
     <child link="body_RightUpperArm_1"/>
     <axis xyz="0 0 1"/>
@@ -973,7 +991,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightShoulder_X" type="revolute">
+  <joint name="jRightShoulder_X" type="continuous">
     <parent link="body_RightUpperArm_1"/>
     <child link="body_RightUpperArm_2"/>
     <axis xyz="1 0 0"/>
@@ -981,7 +999,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightShoulder_Y" type="revolute">
+  <joint name="jRightShoulder_Y" type="continuous">
     <parent link="body_RightUpperArm_2"/>
     <child link="Right Upper Arm"/>
     <axis xyz="0 1 0"/>
@@ -989,7 +1007,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightElbow_Z" type="revolute">
+  <joint name="jRightElbow_Z" type="continuous">
     <parent link="Right Upper Arm"/>
     <child link="body_RightForearm_1"/>
     <axis xyz="0 0 1"/>
@@ -997,7 +1015,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightElbow_X" type="revolute">
+  <joint name="jRightElbow_X" type="continuous">
     <parent link="body_RightForearm_1"/>
     <child link="body_RightForearm_2"/>
     <axis xyz="1 0 0"/>
@@ -1005,7 +1023,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightElbow_Y" type="revolute">
+  <joint name="jRightElbow_Y" type="continuous">
     <parent link="body_RightForearm_2"/>
     <child link="Right Forearm"/>
     <axis xyz="0 1 0"/>
@@ -1013,7 +1031,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightWrist_X" type="revolute">
+  <joint name="jRightWrist_X" type="continuous">
     <parent link="Right Forearm"/>
     <child link="body_RightHand_1"/>
     <axis xyz="1 0 0"/>
@@ -1021,7 +1039,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightWrist_Z" type="revolute">
+  <joint name="jRightWrist_Z" type="continuous">
     <parent link="body_RightHand_1"/>
     <child link="body_RightHand_2"/>
     <axis xyz="0 0 1"/>
@@ -1029,7 +1047,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightWrist_Y" type="revolute">
+  <joint name="jRightWrist_Y" type="continuous">
     <parent link="body_RightHand_2"/>
     <child link="Right Hand"/>
     <axis xyz="0 1 0"/>
@@ -1038,7 +1056,7 @@
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
   <!-- Left arm joints -->
-  <joint name="jLeftC7Shoulder_Z" type="revolute">
+  <joint name="jLeftC7Shoulder_Z" type="continuous">
     <parent link="T8"/>
     <child link="body_LeftShoulder_1"/>
     <axis xyz="0 0 1"/>
@@ -1046,7 +1064,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftC7Shoulder_X" type="revolute">
+  <joint name="jLeftC7Shoulder_X" type="continuous">
     <parent link="body_LeftShoulder_1"/>
     <child link="body_LeftShoulder_2"/>
     <axis xyz="1 0 0"/>
@@ -1054,7 +1072,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftC7Shoulder_Y" type="revolute">
+  <joint name="jLeftC7Shoulder_Y" type="continuous">
     <parent link="body_LeftShoulder_2"/>
     <child link="Left Shoulder"/>
     <axis xyz="0 1 0"/>
@@ -1062,7 +1080,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftShoulder_Z" type="revolute">
+  <joint name="jLeftShoulder_Z" type="continuous">
     <parent link="Left Shoulder"/>
     <child link="body_LeftUpperArm_1"/>
     <axis xyz="0 0 1"/>
@@ -1070,7 +1088,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftShoulder_X" type="revolute">
+  <joint name="jLeftShoulder_X" type="continuous">
     <parent link="body_LeftUpperArm_1"/>
     <child link="body_LeftUpperArm_2"/>
     <axis xyz="1 0 0"/>
@@ -1078,7 +1096,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftShoulder_Y" type="revolute">
+  <joint name="jLeftShoulder_Y" type="continuous">
     <parent link="body_LeftUpperArm_2"/>
     <child link="Left Upper Arm"/>
     <axis xyz="0 1 0"/>
@@ -1086,7 +1104,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftElbow_Z" type="revolute">
+  <joint name="jLeftElbow_Z" type="continuous">
     <parent link="Left Upper Arm"/>
     <child link="body_LeftForearm_1"/>
     <axis xyz="0 0 1"/>
@@ -1094,7 +1112,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftElbow_X" type="revolute">
+  <joint name="jLeftElbow_X" type="continuous">
     <parent link="body_LeftForearm_1"/>
     <child link="body_LeftForearm_2"/>
     <axis xyz="1 0 0"/>
@@ -1102,7 +1120,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftElbow_Y" type="revolute">
+  <joint name="jLeftElbow_Y" type="continuous">
     <parent link="body_LeftForearm_2"/>
     <child link="Left Forearm"/>
     <axis xyz="0 1 0"/>
@@ -1110,7 +1128,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftWrist_X" type="revolute">
+  <joint name="jLeftWrist_X" type="continuous">
     <parent link="Left Forearm"/>
     <child link="body_LeftHand_1"/>
     <axis xyz="1 0 0"/>
@@ -1118,7 +1136,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftWrist_Z" type="revolute">
+  <joint name="jLeftWrist_Z" type="continuous">
     <parent link="body_LeftHand_1"/>
     <child link="body_LeftHand_2"/>
     <axis xyz="0 0 1"/>
@@ -1126,7 +1144,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftWrist_Y" type="revolute">
+  <joint name="jLeftWrist_Y" type="continuous">
     <parent link="body_LeftHand_2"/>
     <child link="Left Hand"/>
     <axis xyz="0 1 0"/>
@@ -1135,7 +1153,7 @@
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
   <!-- Right leg joints -->
-  <joint name="jRightHip_Z" type="revolute">
+  <joint name="jRightHip_Z" type="continuous">
     <parent link="Pelvis"/>
     <child link="body_RightUpperLeg_1"/>
     <axis xyz="0 0 1"/>
@@ -1143,7 +1161,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightHip_X" type="revolute">
+  <joint name="jRightHip_X" type="continuous">
     <parent link="body_RightUpperLeg_1"/>
     <child link="body_RightUpperLeg_2"/>
     <axis xyz="1 0 0"/>
@@ -1151,7 +1169,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightHip_Y" type="revolute">
+  <joint name="jRightHip_Y" type="continuous">
     <parent link="body_RightUpperLeg_2"/>
     <child link="Right Upper Leg"/>
     <axis xyz="0 1 0"/>
@@ -1159,7 +1177,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightKnee_Z" type="revolute">
+  <joint name="jRightKnee_Z" type="continuous">
     <parent link="Right Upper Leg"/>
     <child link="body_RightLowerLeg_1"/>
     <axis xyz="0 0 1"/>
@@ -1167,7 +1185,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightKnee_X" type="revolute">
+  <joint name="jRightKnee_X" type="continuous">
     <parent link="body_RightLowerLeg_1"/>
     <child link="body_RightLowerLeg_2"/>
     <axis xyz="1 0 0"/>
@@ -1175,7 +1193,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightKnee_Y" type="revolute">
+  <joint name="jRightKnee_Y" type="continuous">
     <parent link="body_RightLowerLeg_2"/>
     <child link="Right Lower Leg"/>
     <axis xyz="0 1 0"/>
@@ -1183,7 +1201,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightAnkle_Z" type="revolute">
+  <joint name="jRightAnkle_Z" type="continuous">
     <parent link="Right Lower Leg"/>
     <child link="body_RightFoot_1"/>
     <axis xyz="0 0 1"/>
@@ -1191,7 +1209,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightAnkle_X" type="revolute">
+  <joint name="jRightAnkle_X" type="continuous">
     <parent link="body_RightFoot_1"/>
     <child link="body_RightFoot_2"/>
     <axis xyz="1 0 0"/>
@@ -1199,7 +1217,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightAnkle_Y" type="revolute">
+  <joint name="jRightAnkle_Y" type="continuous">
     <parent link="body_RightFoot_2"/>
     <child link="Right Foot"/>
     <axis xyz="0 1 0"/>
@@ -1207,7 +1225,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightBallFoot_Z" type="revolute">
+  <joint name="jRightBallFoot_Z" type="continuous">
     <parent link="Right Foot"/>
     <child link="body_RightToe_1"/>
     <axis xyz="0 0 1"/>
@@ -1215,7 +1233,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightBallFoot_X" type="revolute">
+  <joint name="jRightBallFoot_X" type="continuous">
     <parent link="body_RightToe_1"/>
     <child link="body_RightToe_2"/>
     <axis xyz="1 0 0"/>
@@ -1223,7 +1241,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jRightBallFoot_Y" type="revolute">
+  <joint name="jRightBallFoot_Y" type="continuous">
     <parent link="body_RightToe_2"/>
     <child link="Right Toe"/>
     <axis xyz="0 1 0"/>
@@ -1233,7 +1251,7 @@
   </joint>
 
   <!-- Left leg joints -->
-  <joint name="jLeftHip_Z" type="revolute">
+  <joint name="jLeftHip_Z" type="continuous">
     <parent link="Pelvis"/>
     <child link="body_LeftUpperLeg_1"/>
     <axis xyz="0 0 1"/>
@@ -1241,7 +1259,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftHip_X" type="revolute">
+  <joint name="jLeftHip_X" type="continuous">
     <parent link="body_LeftUpperLeg_1"/>
     <child link="body_LeftUpperLeg_2"/>
     <axis xyz="1 0 0"/>
@@ -1249,7 +1267,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftHip_Y" type="revolute">
+  <joint name="jLeftHip_Y" type="continuous">
     <parent link="body_LeftUpperLeg_2"/>
     <child link="Left Upper Leg"/>
     <axis xyz="0 1 0"/>
@@ -1257,7 +1275,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftKnee_Z" type="revolute">
+  <joint name="jLeftKnee_Z" type="continuous">
     <parent link="Left Upper Leg"/>
     <child link="body_LeftLowerLeg_1"/>
     <axis xyz="0 0 1"/>
@@ -1265,7 +1283,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftKnee_X" type="revolute">
+  <joint name="jLeftKnee_X" type="continuous">
     <parent link="body_LeftLowerLeg_1"/>
     <child link="body_LeftLowerLeg_2"/>
     <axis xyz="1 0 0"/>
@@ -1273,7 +1291,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftKnee_Y" type="revolute">
+  <joint name="jLeftKnee_Y" type="continuous">
     <parent link="body_LeftLowerLeg_2"/>
     <child link="Left Lower Leg"/>
     <axis xyz="0 1 0"/>
@@ -1281,7 +1299,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftAnkle_Z" type="revolute">
+  <joint name="jLeftAnkle_Z" type="continuous">
     <parent link="Left Lower Leg"/>
     <child link="body_LeftFoot_1"/>
     <axis xyz="0 0 1"/>
@@ -1289,7 +1307,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftAnkle_X" type="revolute">
+  <joint name="jLeftAnkle_X" type="continuous">
     <parent link="body_LeftFoot_1"/>
     <child link="body_LeftFoot_2"/>
     <axis xyz="1 0 0"/>
@@ -1297,7 +1315,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftAnkle_Y" type="revolute">
+  <joint name="jLeftAnkle_Y" type="continuous">
     <parent link="body_LeftFoot_2"/>
     <child link="Left Foot"/>
     <axis xyz="0 1 0"/>
@@ -1305,7 +1323,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftBallFoot_Z" type="revolute">
+  <joint name="jLeftBallFoot_Z" type="continuous">
     <parent link="Left Foot"/>
     <child link="body_LeftToe_1"/>
     <axis xyz="0 0 1"/>
@@ -1313,7 +1331,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftBallFoot_X" type="revolute">
+  <joint name="jLeftBallFoot_X" type="continuous">
     <parent link="body_LeftToe_1"/>
     <child link="body_LeftToe_2"/>
     <axis xyz="1 0 0"/>
@@ -1321,7 +1339,7 @@
     <limit effort="1000" lower="-6.28318530718" upper="6.28318530718" velocity="1.0"/>
     <dynamics damping="0.01" friction="0.0"/>
   </joint>
-  <joint name="jLeftBallFoot_Y" type="revolute">
+  <joint name="jLeftBallFoot_Y" type="continuous">
     <parent link="body_LeftToe_2"/>
     <child link="Left Toe"/>
     <axis xyz="0 1 0"/>
