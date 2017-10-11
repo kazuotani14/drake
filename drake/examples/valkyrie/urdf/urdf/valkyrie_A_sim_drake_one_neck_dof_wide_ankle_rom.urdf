@@ -3117,5 +3117,10 @@
     <member link="leftPalm"/>
     <ignored_collision_filter_group collision_filter_group="l_arm"/>
   </collision_filter_group>
+  <collision_filter_group name="neck_hokuyo">
+    <member link="upperNeckPitchLink"/>
+    <member link="hokuyo_link"/>
+    <ignored_collision_filter_group collision_filter_group="neck_hokuyo"/>
+  </collision_filter_group>
   <!-- end drake collision free groups-->
 </robot>
