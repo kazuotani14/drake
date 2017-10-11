@@ -18,6 +18,8 @@
 *.snm
 *.nav
 *~
+*ps
+*.dot
 uname.err
 drake/util/drake_config.mat
 drake/doc/derivations/elib.bib

@@ -1354,4 +1354,49 @@
       <robotNamespace>/</robotNamespace>
     </plugin>
   </gazebo>
+
+  <!-- Collision filter groups to ignore -->
+  <collision_filter_group name="core">
+    <member link="Pelvis"/>
+    <member link="L5"/>
+    <member link="L3"/>
+    <member link="T12"/>
+    <member link="T8"/>
+    <member link="Neck"/>
+    <member link="Head"/>
+    <ignored_collision_filter_group collision_filter_group="core"/>
+  </collision_filter_group>
+
+  <collision_filter_group name="right_leg">
+    <member link="Right Foot"/>
+    <member link="Right Toe"/>
+    <member link="Right Lower Leg"/>
+    <member link="Right Upper Leg"/>
+    <ignored_collision_filter_group collision_filter_group="right_leg"/>
+  </collision_filter_group>
+
+  <collision_filter_group name="left_leg">
+    <member link="Left Foot"/>
+    <member link="Left Toe"/>
+    <member link="Left Lower Leg"/>
+    <member link="Left Upper Leg"/>
+    <ignored_collision_filter_group collision_filter_group="left_leg"/>
+  </collision_filter_group>
+
+  <collision_filter_group name="left_arm">
+    <member link="Left Shoulder"/>
+    <member link="Left Upper Arm"/>
+    <member link="Left Forearm"/>
+    <member link="Left Hand"/>
+    <ignored_collision_filter_group collision_filter_group="left_arm"/>
+  </collision_filter_group>
+
+  <collision_filter_group name="right_arm">
+    <member link="Right Shoulder"/>
+    <member link="Right Upper Arm"/>
+    <member link="Right Forearm"/>
+    <member link="Right Hand"/>
+    <ignored_collision_filter_group collision_filter_group="right_arm"/>
+  </collision_filter_group>
+
 </robot>
