@@ -21,12 +21,144 @@ namespace drake {
 namespace solvers {
 namespace {
 
+// KAZU TRYING STUFF
+// Making method for extracting Q, c, Aeq, beq, Aineq, bineq matrices from QP
+// Trying to find root cause of Mosek QP failing afer a few iterations
+// TODO fix seg fault during tests - happens because start index is wrong (out of matrix range)
+///////////////////
+
+// #define PRINT_EIGEN
+// #define EXTRACT_MATRICES
+
+#ifdef PRINT_EIGEN
+void print_eigen(const std::string name, const Eigen::MatrixXd& mat) {
+  Eigen::IOFormat CleanFmt(3, 0, ", ", "\n", "", "");
+  std::cout << "-----" << std::endl;
+  if(mat.cols() == 1) {
+    std::cout << name << "= [ " << mat.transpose().format(CleanFmt) << " ]" << std::endl;
+  }
+  else {
+    std::cout << name << "= [\n" << mat.format(CleanFmt) << " ]" << std::endl;
+  }
+}
+#endif
+
+#ifdef EXTRACT_MATRICES
+
+// TODO fix insertion indices of A and b matrices
+// Add both LinearConstraints and LinearEqualityConstraints to gurobi
+// Assume all matrices are double?
+void PrintLinearConstraints(MathematicalProgram& prog) {
+  // find total number of constraints to resize matrices
+  int num_eq = 0;
+  for (const auto& binding : prog.linear_equality_constraints()) {
+    const auto& constraint = binding.constraint();
+    num_eq += constraint->A().rows();
+  }
+
+  int num_ineq = 0;
+  for (const auto& binding : prog.linear_constraints()) {
+    const auto& constraint = binding.constraint();
+    num_ineq += constraint->A().rows();
+  }
+
+  Eigen::MatrixXd Aeq_all = Eigen::MatrixXd(num_eq, 68);
+  Eigen::VectorXd beq_all = Eigen::VectorXd(num_eq);
+  Eigen::MatrixXd Aineq_all = Eigen::MatrixXd(num_ineq, 68);
+  Eigen::VectorXd bineq_all = Eigen::VectorXd(num_ineq);
+
+  // auto print_constraint_info = []()
+
+  //TODO add up A and b values into single matrices
+  int eq_idx = 0;
+  for (const auto& binding : prog.linear_equality_constraints()) {
+    const auto& constraint = binding.constraint();
+    int start = prog.FindDecisionVariableIndex(binding.variables()(0));
+
+    Eigen::MatrixXd Aeq = constraint->A();
+    Eigen::VectorXd beq = constraint->lower_bound();
+
+    std::cout << constraint->get_description() << std::endl;
+    // std::cout << "Aeq: " << Aeq.rows() << " " << Aeq.cols() << " beq: " << beq.rows() << " " << beq.cols() << std::endl;
+    // std::cout << "start: " << start << std::endl;
+
+    // TODO second element shouldn't be zero here - fix
+    Aeq_all.block(eq_idx, start, Aeq.rows(), Aeq.cols()) = Aeq;
+    beq_all.segment(start, beq.size()) = beq;
+
+    eq_idx += Aeq.rows();
+  }
+
+  int ineq_idx = 0;
+  for (const auto& binding : prog.linear_constraints()) {
+    // binding.variables() is eigen vector of symbolic::Variable
+    const auto& constraint = binding.constraint();
+    int start = prog.FindDecisionVariableIndex(binding.variables()(0));
+
+    Eigen::MatrixXd Aineq = constraint->A();
+    Eigen::VectorXd lb = constraint->lower_bound();
+
+    std::cout << constraint->get_description() << std::endl;
+    // std::cout << "Aineq: " << Aineq.rows() << " " << Aineq.cols() << " bineq: " << lb.rows() << " " << lb.cols() << std::endl;
+    // std::cout << "start: " << start << std::endl;
+
+    Aineq_all.block(ineq_idx, start, Aineq.rows(), Aineq.cols()) = Aineq;
+    bineq_all.segment(ineq_idx, lb.size()) = lb;
+
+    ineq_idx += Aineq.rows();
+  }
+
+#ifdef PRINT_EIGEN
+  print_eigen("Aeq", Aeq_all);
+  print_eigen("beq", Aeq_all);
+  print_eigen("Aineq", Aineq_all);
+  print_eigen("bineq", bineq_all);
+#endif
+}
+
+void PrintCosts(const MathematicalProgram& prog) {
+  // Aggregates the quadratic costs and linear costs in the form
+  // 0.5 * x' * Q_all * x + linear_term' * x.
+  using std::abs;
+
+  int num_vars = prog.num_vars();
+  Eigen::MatrixXd Qall = Eigen::MatrixXd(num_vars, num_vars);
+  Eigen::VectorXd ball = Eigen::VectorXd(num_vars);
+
+  for (const auto& binding : prog.quadratic_costs()) {
+    const auto& constraint = binding.constraint();
+    const Eigen::MatrixXd& Q = constraint->Q();
+    const Eigen::VectorXd& b = constraint->b();
+
+    int start = prog.FindDecisionVariableIndex(binding.variables()(0));
+
+    std::cout << constraint->get_description() << std::endl;
+    // std::cout << "Q: " << Q.rows() << " " << Q.cols() << " c: " << b.rows() << " " << b.cols() << std::endl;
+    // std::cout << "start: " << start << std::endl;
+
+    Qall.block(start, start, Q.rows(), Q.cols()) += Q;
+    ball.segment(start, b.size()) += b;
+  }
+
+#ifdef PRINT_EIGEN
+  print_eigen("Q", Qall);
+  print_eigen("c", ball);
+#endif
+}
+
+#endif
+
+///////////////////
+// END KAZU TRYING STUFF
+
+
 // Add LinearConstraints and LinearEqualityConstraints to the Mosek task.
 template <typename C>
 MSKrescodee AddLinearConstraintsFromBindings(
     MSKtask_t* task, const std::vector<Binding<C>>& constraint_list,
     bool is_equality_constraint, const MathematicalProgram& prog) {
   for (const auto& binding : constraint_list) {
+
     auto constraint = binding.constraint();
     const Eigen::MatrixXd& A = constraint->A();
     const Eigen::VectorXd& lb = constraint->lower_bound();
@@ -389,6 +521,7 @@ MSKrescodee AddLinearMatrixInequalityConstraint(const MathematicalProgram& prog,
                                                 MSKtask_t* task) {
   MSKrescodee rescode = MSK_RES_OK;
   for (const auto& binding : prog.linear_matrix_inequality_constraints()) {
+
     int num_linear_constraint = 0;
     rescode = MSK_getnumcon(*task, &num_linear_constraint);
     if (rescode != MSK_RES_OK) {
@@ -638,6 +771,7 @@ SolutionResult MosekSolver::Solve(MathematicalProgram& prog) const {
   // KAZU TRYING STUFF
   // PrintLinearConstraints(prog);
   // PrintCosts(prog);
+
   const int num_vars = prog.num_vars();
   MSKtask_t task = nullptr;
   MSKrescodee rescode;
