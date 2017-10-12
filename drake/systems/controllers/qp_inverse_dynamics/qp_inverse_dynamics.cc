@@ -402,7 +402,12 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
   // I made the dynamics and stationary contact equality constraints.
   // Alternatively, they can be set up as high weight cost terms. This is
   // sometimes preferred as it introduce slacks for better stability.
-  // TODO update above to reflect that contact is soft constraint now
+  //
+  // Update: contact constraints are now cost terms:
+  // vel_contact = J_c * v
+  // accel_contact = J_c * vd + Jd * v
+  // minimize || accel_contact + Kd * vel_contact ||^2
+  //  eqn 12 in [1], replacing slack term with quadratic objective towards zero
   //
   // For more details on the QP formulation, please refer to:
   // [1] An efficiently solvable quadratic program for stabilizing dynamic
@@ -451,10 +456,6 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
   }
 
   // Contact constraints, 3 rows per contact point
-  // Soft contact constraint is formulated as:
-  // accel_contact + (Kd * vel_contact) = 0 (eqn 12 in [1], without slack)
-  // accel_c = J_c * vd + Jd * v
-  // minimize || J_c * vd + Jd * v + Kd * J_c * v ||^2
   rowIdx = 0;
   int cost_ctr = 0, eq_ctr = 0;
   for (const auto& contact_pair : input.contact_information()) {
