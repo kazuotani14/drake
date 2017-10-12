@@ -157,7 +157,7 @@ void HumanoidManipulationPlan<T>::HandlePlanGenericPlanDerived(
   {
     // CoM has 1 more knot point to ensure the trajectory ends at zero velocity.
     // TODO(siyuan): have the zmp planner deal with this.
-    // Repeats the last desired CoM position to ensure CoM trajector ends in
+    // Repeats the last desired CoM position to ensure CoM trajectory ends in
     // zero velocity.
     com_times.push_back(com_times.back() + 0.1);
     com_knots.push_back(com_knots.back());

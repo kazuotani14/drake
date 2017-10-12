@@ -51,7 +51,7 @@ void send_manip_message() {
   // contact points.
   // 5. Pelvis z and orientation + torso orientation are tracked in Cartesian
   // mode (These can be changed by the gains in the configuration file). CoM
-  // in controlled by a LQR like controller, where the desired is given by the
+  // is controlled by a LQR like controller, where the desired is given by the
   // knot points specified here.
   robotlocomotion::robot_plan_t msg{};
   msg.utime = time(NULL);

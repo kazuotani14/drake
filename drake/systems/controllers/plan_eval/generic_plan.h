@@ -27,7 +27,7 @@ namespace plan_eval {
 typedef std::unordered_set<const RigidBody<double>*> ContactState;
 
 /**
- * This class represents a plan interpretor, which conceptually serves as a
+ * This class represents a plan interpreter, which conceptually serves as a
  * bridge between a high level planner (e.g. A* planner) and a low level
  * controller (e.g. PID controller). It is responsible for generating high
  * frequency / dense commands that are compatible with the low level controller
