@@ -63,8 +63,7 @@ void QpInverseDynamics::SetTempMatricesToZero() {
 
 QpInverseDynamics::QpInverseDynamics() {
   if (!solver_.available()) {
-    // throw std::runtime_error("Gurobi solver not available.");
-    throw std::runtime_error("Mosek solver not available.");
+    throw std::runtime_error("Gurobi solver not available.");
   }
 }
 
@@ -403,7 +402,7 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
   // I made the dynamics and stationary contact equality constraints.
   // Alternatively, they can be set up as high weight cost terms. This is
   // sometimes preferred as it introduce slacks for better stability.
-  // TODO update above to reflet that contact is soft constraint now
+  // TODO update above to reflect that contact is soft constraint now
   //
   // For more details on the QP formulation, please refer to:
   // [1] An efficiently solvable quadratic program for stabilizing dynamic
