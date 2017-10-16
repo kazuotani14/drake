@@ -535,12 +535,12 @@
       <origin rpy="1.57079632679 0 0" xyz="0 -0.221 0"/>
       <material name="blue"/>
     </visual>
-    <!--<collision>-->
-      <!--<geometry>-->
-        <!--<cylinder length="0.442" radius="0.0806551326413"/>-->
-      <!--</geometry>-->
-      <!--<origin rpy="1.57079632679 0 0" xyz="0 -0.221 0"/>-->
-    <!--</collision>-->
+    <collision>
+      <geometry>
+        <cylinder length="0.442" radius="0.0806551326413"/>
+      </geometry>
+      <origin rpy="1.57079632679 0 0" xyz="0 -0.221 0"/>
+    </collision>
     <inertial>
       <mass value="9.17279140765"/>
       <origin rpy="1.57079632679 0 0" xyz="0 -0.221 0"/>
@@ -672,12 +672,12 @@
       <origin rpy="1.57079632679 0 0" xyz="0 -0.221 0"/>
       <material name="blue"/>
     </visual>
-    <!--<collision>-->
-      <!--<geometry>-->
-        <!--<cylinder length="0.442" radius="0.0806551326413"/>-->
-      <!--</geometry>-->
-      <!--<origin rpy="1.57079632679 0 0" xyz="0 -0.221 0"/>-->
-    <!--</collision>-->
+    <collision>
+      <geometry>
+        <cylinder length="0.442" radius="0.0806551326413"/>
+      </geometry>
+      <origin rpy="1.57079632679 0 0" xyz="0 -0.221 0"/>
+    </collision>
     <inertial>
       <mass value="9.17279140765"/>
       <origin rpy="1.57079632679 0 0" xyz="0 -0.221 0"/>

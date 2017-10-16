@@ -40,7 +40,8 @@ int DoMain(int argc, char* argv[]) {
 //          "drake/examples/valkyrie/urdf/urdf/"
 //              "valkyrie_A_sim_drake_one_neck_dof_wide_ankle_rom.urdf"),
   FindResourceOrThrow(
-          "drake/examples/human_model/models/new_human_model.urdf"),
+//          "drake/examples/human_model/models/new_human_model.urdf"),
+      "drake/examples/human_model/models/icub/icub_with_transmission.urdf"),
       multibody::joints::kRollPitchYaw, tree_ptr.get());
 
   int n_actuators = tree_ptr->get_num_actuators();
@@ -112,7 +113,7 @@ int DoMain(int argc, char* argv[]) {
   // First 6 entries are floating-base
   x0[2] = 2.0;
 //  x0[3] = 1.0;
-//  x0[4] = 1.0;
+  x0[4] = 1.0;
 
   simulator.get_mutable_context()
       ->get_mutable_continuous_state_vector()
