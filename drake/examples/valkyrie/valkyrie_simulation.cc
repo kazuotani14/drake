@@ -24,6 +24,8 @@ int main() {
 
   // Integrator set arbitrarily. The time step was selected by tuning for the
   // largest value that appears to give stable results.
+  // original timestep: 3e-4
+  // any larger timesteps resulted in instability (contacts would "slide")
   simulator.reset_integrator<systems::SemiExplicitEulerIntegrator<double>>(
       diagram, 3e-4, context);
   simulator.set_publish_every_time_step(false);

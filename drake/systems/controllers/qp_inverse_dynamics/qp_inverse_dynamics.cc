@@ -542,9 +542,30 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
   row_idx_as_eq =
       input.desired_centroidal_momentum_dot().GetConstraintTypeIndices(
           ConstraintType::Hard);
+
+  // (kazu) manually calculating desired centroidal momentum dot (in place of com task)
+  //  Vector3<double> desired_com(0.0075, 0.0, 0.96);
+  Vector3<double> desired_com(0.0075, 0.07, 0.96);
+  Vector6<double> desired_vdot = input.desired_centroidal_momentum_dot().values();
+  double kp = 50.0;
+  double kd = 70.0;
+  Vector3<double> cur_com =  rs.get_com();
+  Vector3<double> cur_comv = rs.get_com_velocity();
+  desired_vdot[3] = kp*(desired_com[0] - cur_com[0]) + kd*(-cur_comv[0]);
+  desired_vdot[4] = kp*(desired_com[1] - cur_com[1]) + kd*(-cur_comv[1]);
+  //desired_vdot[5] = kp*(desired_com[2] - cur_com[2]) + kd*(-cur_comv[2]);
+
+//  std::cout << "their   cenmdot: " << input.desired_centroidal_momentum_dot().values().tail(3).transpose() << std::endl;
+//  std::cout << "My      cenmdot: " << desired_vdot.tail(3).transpose() << std::endl;
+//  std::cout << "Current com pos: " << cur_com.transpose() << std::endl;
+  //std::cout << "Current com vel: " << cur_comv.transpose() << std::endl;
+
+//  Vector6<double> vdotdes_using = input.desired_centroidal_momentum_dot().values();
+  Vector6<double> vdotdes_using = desired_vdot;
+
   Vector6<double> linear_term =
       rs.get_centroidal_momentum_matrix_dot_times_v() -
-      input.desired_centroidal_momentum_dot().values();
+          vdotdes_using;
   AddAsCosts(rs.get_centroidal_momentum_matrix(), linear_term,
              input.desired_centroidal_momentum_dot().weights(), row_idx_as_cost,
              cost_cen_mom_dot_);
@@ -561,7 +582,20 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
     body_Jdv_[body_ctr] =
         robot.CalcBodySpatialVelocityJacobianDotTimesVInWorldFrame(
             cache, body_motion_d.body());
-    linear_term = body_Jdv_[body_ctr] - body_motion_d.values();
+
+    // TODO manually calculate linear term here
+    if(pair.first == "rightPalm") {
+      auto t = robot.CalcBodyPoseInWorldFrame(cache, body_motion_d.body());
+      Vector3<double> cur_pos = t.translation();
+//      std::cout << cur_pos.transpose() << std::endl;
+      Vector3<double> desired_pos(0.2, -0.4, 0.77);
+      auto body_motion_des = body_motion_d.values();
+      body_motion_des.tail(3) = 150.0 * (desired_pos - cur_pos);
+      linear_term = body_Jdv_[body_ctr] - body_motion_des;
+    }
+    else{
+      linear_term = body_Jdv_[body_ctr] - body_motion_d.values();
+    }
 
     // Find the rows that correspond to cost and equality constraints.
     row_idx_as_cost =

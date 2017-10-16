@@ -87,3 +87,15 @@ body_group {
   name: "torso"
   member: "torso"
 }
+
+body_group {
+  name: "rightPalm"
+  member: "rightPalm"
+}
+
+body_group {
+  name: "leftPalm"
+  member: "leftPalm"
+}
+
+

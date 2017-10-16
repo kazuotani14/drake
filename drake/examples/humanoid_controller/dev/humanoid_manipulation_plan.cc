@@ -46,7 +46,9 @@ void HumanoidManipulationPlan<T>::InitializeGenericPlanDerived(
   this->UpdateContactState(double_support);
 
   // Sets body tracking trajectories for pelvis and torso.
-  const std::vector<std::string> tracked_body_names = {"pelvis", "torso"};
+  // TODO (kazu) read these bodies from config file
+  // TODO (kazu) find where gains are read
+  const std::vector<std::string> tracked_body_names = {"pelvis", "torso", "rightPalm"};
   MatrixX<T> position;
   for (const auto& name : tracked_body_names) {
     const RigidBody<T>* body = alias_groups.get_body(name);
@@ -121,7 +123,8 @@ void HumanoidManipulationPlan<T>::HandlePlanGenericPlanDerived(
   std::vector<MatrixX<T>> dof_knots(1, q);
   std::unordered_map<const RigidBody<T>*, std::vector<Isometry3<T>>> body_knots;
   std::vector<const RigidBody<T>*> tracked_bodies = {
-      alias_groups.get_body("pelvis"), alias_groups.get_body("torso")};
+      alias_groups.get_body("pelvis"), alias_groups.get_body("torso"),
+      alias_groups.get_body("rightPalm")};
   for (const RigidBody<T>* body : tracked_bodies) {
     body_knots[body] = std::vector<Isometry3<T>>(
         1, this->get_body_trajectory(body).get_pose(time_now));

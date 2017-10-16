@@ -11,7 +11,7 @@ message Vec3 {
 
 // Contains parameters for specifying desired accelerations for the inverse
 // dynamics controller. This can be used to specify for accelerations in the
-// genearlized coordinates (N dimensional) or for spatial accelerations of
+// generalized coordinates (N dimensional) or for spatial accelerations of
 // tracked bodies (6 dimensional). When used for bodies, the first 3 dimensions
 // of kp, kd, and weight correspond to the angular components.
 // A way to generate the desired acceleration vd_d is through a simple PD law
