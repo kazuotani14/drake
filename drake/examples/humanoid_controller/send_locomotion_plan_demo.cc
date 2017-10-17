@@ -15,8 +15,9 @@
 #include "drake/multibody/parsers/urdf_parser.h"
 #include "drake/multibody/rigid_body_tree.h"
 
-DEFINE_double(r_shy_offset, 0,
-              "Right shoulder pitch offset [rad].");
+//DEFINE_double(r_shy_offset, 0,
+//              "Right shoulder pitch offset [rad].");
+//  q[10] += FLAGS_r_shy_offset;
 
 using std::default_random_engine;
 
@@ -60,8 +61,29 @@ void send_manip_message() {
   msg.plan.resize(msg.num_states);
   msg.plan_info.resize(msg.num_states, 1);
 
-  // right shoulder pitch
-  q[10] += FLAGS_r_shy_offset;
+  msg.num_body_poses = 3;
+  msg.body_names.resize(msg.num_body_poses);
+  msg.body_pose_des.resize(msg.num_body_poses);
+  msg.body_names[0] = "com";
+  bot_core::pose_t com_pose_des;
+  com_pose_des.pos[0] = 0.0;
+  com_pose_des.pos[1] = 0.07;
+  msg.body_pose_des[0] = com_pose_des;
+
+  msg.body_names[1] = "rightPalm";
+  bot_core::pose_t righthand_pose_des;
+  righthand_pose_des.pos[0] = 0.43;
+  righthand_pose_des.pos[1] = -0.38;
+  righthand_pose_des.pos[2] = 0.94;
+  msg.body_pose_des[1] = righthand_pose_des;
+
+  msg.body_names[2] = "leftPalm";
+  bot_core::pose_t lefthand_pose_des;
+  lefthand_pose_des.pos[0] = 0.43;
+  lefthand_pose_des.pos[1] = 0.38;
+  lefthand_pose_des.pos[2] = 0.94;
+  msg.body_pose_des[2] = lefthand_pose_des;
+
   translator.InitializeMessage(&(msg.plan[0]));
   translator.EncodeMessageKinematics(q, v, &(msg.plan[0]));
   msg.plan[0].utime = 1e6;

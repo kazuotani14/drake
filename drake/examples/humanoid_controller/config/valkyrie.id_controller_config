@@ -103,15 +103,39 @@ body_motion {
     kp: 0
     kp: 0
     kp: 0
-    kp: 40
-    kp: 40
+    kp: 15
+    kp: 15
     kp: 0
 
     kd: 0
     kd: 0
     kd: 0
-    kd: 12
-    kd: 12
+    kd: 10
+    kd: 10
+    kd: 0
+
+    weight: 0
+    weight: 0
+    weight: 0
+    weight: 7
+    weight: 7
+    weight: 0
+}
+
+body_motion {
+    name: "leftPalm"
+    kp: 0
+    kp: 0
+    kp: 0
+    kp: 15
+    kp: 15
+    kp: 0
+
+    kd: 0
+    kd: 0
+    kd: 0
+    kd: 10
+    kd: 10
     kd: 0
 
     weight: 0

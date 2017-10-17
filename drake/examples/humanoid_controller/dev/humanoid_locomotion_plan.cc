@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 
 #include "robotlocomotion/robot_plan_t.hpp"
 #include "drake/examples/humanoid_controller/lcm_custom_types/robotlocomotion/robot_plan_custom_t.hpp"
@@ -49,7 +50,7 @@ void HumanoidLocomotionPlan<T>::InitializeGenericPlanDerived(
   // Sets body tracking trajectories for pelvis and torso.
   // TODO (kazu) read these bodies from config file
   // TODO (kazu) find where gains are read
-  const std::vector<std::string> tracked_body_names = {"pelvis", "torso", "rightPalm"};
+  const std::vector<std::string> tracked_body_names = {"pelvis", "torso", "rightPalm", "leftPalm"};
   MatrixX<T> position;
   for (const auto& name : tracked_body_names) {
     const RigidBody<T>* body = alias_groups.get_body(name);
@@ -125,7 +126,7 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
   std::unordered_map<const RigidBody<T>*, std::vector<Isometry3<T>>> body_knots;
   std::vector<const RigidBody<T>*> tracked_bodies = {
       alias_groups.get_body("pelvis"), alias_groups.get_body("torso"),
-      alias_groups.get_body("rightPalm")};
+      alias_groups.get_body("rightPalm"), alias_groups.get_body("leftPalm")};
   for (const RigidBody<T>* body : tracked_bodies) {
     body_knots[body] = std::vector<Isometry3<T>>(
         1, this->get_body_trajectory(body).get_pose(time_now));
@@ -135,6 +136,9 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
 
   const manipulation::RobotStateLcmMessageTranslator translator(
       robot_status.get_robot());
+
+  const auto& body_names = msg.body_names;
+  const auto& body_des_poses = msg.body_pose_des;
 
   for (const bot_core::robot_state_t& keyframe : msg.plan) {
     translator.DecodeMessageKinematics(keyframe, q, v);
@@ -151,11 +155,13 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
       const RigidBody<T>* body = body_knots_pair.first;
       Isometry3<double> desired_transform;
       std::vector<Isometry3<T>>& knots = body_knots_pair.second;
-      if(body->get_name() == "rightPalm") {
-        // TODO (kazu) Pull these out to be included in the robot_plan message
-        // manually construct end effector desired pose isometries
-        std::cout << "setting rightPalm desired position" << std::endl;
-        Vector3<double> desired_pos(0.5, -0.38, 0.94);
+
+      auto bodyname_itr = std::find(body_names.begin(), body_names.end(), body->get_name());
+      if(bodyname_itr != body_names.end()) {
+        std::cout << body->get_name() << std::endl;
+        int idx = bodyname_itr - body_names.begin();
+        const auto& des_pose = body_des_poses[idx];
+        Vector3<double> desired_pos(des_pose.pos[0], des_pose.pos[1], des_pose.pos[2]);
         desired_transform.translate(desired_pos);
       }
       else {
@@ -165,8 +171,14 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
     }
 
     // Computes com.
-    Vector2<double> current_com = robot.centerOfMass(cache).template head<2>();
-    Vector2<double> desired_com(current_com[0], 0.07);
+    Vector2<double> desired_com = robot.centerOfMass(cache).template head<2>();
+    for(int i=0; i<msg.num_body_poses; ++i) {
+      std::string name = body_names[i];
+      if(name == "com") {
+        const auto& des_pose = body_des_poses[i];
+        desired_com = {des_pose.pos[0], des_pose.pos[1]};
+      }
+    }
     com_knots.push_back(desired_com);
 //    com_knots.push_back(robot.centerOfMass(cache).template head<2>());
   }
