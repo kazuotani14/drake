@@ -138,6 +138,26 @@ drake_cc_binary(
         "//drake/examples/valkyrie:models",
     ],
     deps = [
+        "//drake/common:find_resource",
+        "//drake/examples/valkyrie:valkyrie_constants",
+        "//drake/manipulation/util:robot_state_msg_translator",
+        "//drake/multibody:rigid_body_tree",
+        "//drake/multibody/parsers",
+        "@com_github_gflags_gflags//:gflags",
+        "@lcmtypes_bot2_core",
+        "@lcmtypes_robotlocomotion",
+    ],
+)
+
+drake_cc_binary(
+    name = "send_locomotion_plan_demo",
+    srcs = [
+        "send_locomotion_plan_demo.cc",
+    ],
+    data = [
+        "//drake/examples/valkyrie:models",
+    ],
+    deps = [
         ":humanoid_locomotion_plan",
         "//drake/common:find_resource",
         "//drake/examples/valkyrie:valkyrie_constants",

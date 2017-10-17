@@ -7,6 +7,7 @@
 #include <gflags/gflags.h>
 #include "lcm/lcm-cpp.hpp"
 #include "robotlocomotion/robot_plan_t.hpp"
+#include "drake/examples/humanoid_controller/lcm_custom_types/robotlocomotion/robot_plan_custom_t.hpp"
 
 #include "drake/examples/valkyrie/valkyrie_constants.h"
 #include "drake/manipulation/util/robot_state_msg_translator.h"
@@ -53,7 +54,7 @@ void send_manip_message() {
   // mode (These can be changed by the gains in the configuration file). CoM
   // is controlled by a LQR like controller, where the desired is given by the
   // knot points specified here.
-  robotlocomotion::robot_plan_t msg{};
+  robotlocomotion::robot_plan_custom_t msg{};
   msg.utime = time(NULL);
   msg.num_states = 1;
   msg.plan.resize(msg.num_states);

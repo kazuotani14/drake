@@ -33,6 +33,8 @@ class robot_plan_custom_t
 
         int32_t    num_body_poses;
 
+        std::vector< std::string > body_names;
+
         std::vector< bot_core::pose_t > body_pose_des;
 
         int32_t    num_grasp_transitions;
@@ -198,6 +200,12 @@ int robot_plan_custom_t::_encodeNoHash(void *buf, int offset, int maxlen) const
     if(tlen < 0) return tlen; else pos += tlen;
 
     for (int a0 = 0; a0 < this->num_body_poses; a0++) {
+        char* __cstr = (char*) this->body_names[a0].c_str();
+        tlen = __string_encode_array(buf, offset + pos, maxlen - pos, &__cstr, 1);
+        if(tlen < 0) return tlen; else pos += tlen;
+    }
+
+    for (int a0 = 0; a0 < this->num_body_poses; a0++) {
         tlen = this->body_pose_des[a0]._encodeNoHash(buf, offset + pos, maxlen - pos);
         if(tlen < 0) return tlen; else pos += tlen;
     }
@@ -265,6 +273,16 @@ int robot_plan_custom_t::_decodeNoHash(const void *buf, int offset, int maxlen)
     tlen = __int32_t_decode_array(buf, offset + pos, maxlen - pos, &this->num_body_poses, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
+    this->body_names.resize(this->num_body_poses);
+    for (int a0 = 0; a0 < this->num_body_poses; a0++) {
+        int32_t __elem_len;
+        tlen = __int32_t_decode_array(buf, offset + pos, maxlen - pos, &__elem_len, 1);
+        if(tlen < 0) return tlen; else pos += tlen;
+        if(__elem_len > maxlen - pos) return -1;
+        this->body_names[a0].assign(((const char*)buf) + offset + pos, __elem_len -  1);
+        pos += __elem_len;
+    }
+
     this->body_pose_des.resize(this->num_body_poses);
     for (int a0 = 0; a0 < this->num_body_poses; a0++) {
         tlen = this->body_pose_des[a0]._decodeNoHash(buf, offset + pos, maxlen - pos);
@@ -316,6 +334,9 @@ int robot_plan_custom_t::_getEncodedSizeNoHash() const
     enc_size += __int32_t_encoded_array_size(NULL, this->num_states);
     enc_size += __int32_t_encoded_array_size(NULL, 1);
     for (int a0 = 0; a0 < this->num_body_poses; a0++) {
+        enc_size += this->body_names[a0].size() + 4 + 1;
+    }
+    for (int a0 = 0; a0 < this->num_body_poses; a0++) {
         enc_size += this->body_pose_des[a0]._getEncodedSizeNoHash();
     }
     enc_size += __int32_t_encoded_array_size(NULL, 1);
@@ -339,7 +360,7 @@ uint64_t robot_plan_custom_t::_computeHash(const __lcm_hash_ptr *p)
             return 0;
     const __lcm_hash_ptr cp = { p, robot_plan_custom_t::getHash };
 
-    uint64_t hash = 0xe5217f3a4a278650LL +
+    uint64_t hash = 0xc97bc9d796d29a03LL +
          bot_core::robot_state_t::_computeHash(&cp) +
          bot_core::pose_t::_computeHash(&cp) +
          robotlocomotion::grasp_transition_state_t::_computeHash(&cp);

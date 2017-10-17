@@ -8,8 +8,11 @@ struct robot_plan_custom_t
   bot_core.robot_state_t plan[num_states]; // each individual state is also timed.
   int32_t plan_info[num_states];  // info about the plan state, typically snopt_info value
 
-  int32_t num_body_poses;
-  bot_core.pose_t body_pose_des[num_body_poses];
+  // Force some com/link pose tasks
+  // Need to adjust gains and weights for controlled quantities in config file
+  int32_t num_body_poses; // number of desired poses
+  string body_names[num_body_poses]; // "com", "rightPalm", "leftPalm" TODO add feet
+  bot_core.pose_t body_pose_des[num_body_poses]; // see pose_t for how to set. will set everything manually for now
 
   // Decoupling hand states from robot state as atlas api deals with them separately.
   // Also drake expects robot joints excluding hand joints.
