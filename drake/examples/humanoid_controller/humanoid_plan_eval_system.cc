@@ -8,6 +8,7 @@
 #include "robotlocomotion/robot_plan_t.hpp"
 
 #include "drake/examples/humanoid_controller/dev/humanoid_manipulation_plan.h"
+#include "drake/examples/humanoid_controller/dev/humanoid_locomotion_plan.h"
 
 namespace drake {
 namespace examples {
@@ -25,7 +26,7 @@ HumanoidPlanEvalSystem::HumanoidPlanEvalSystem(
   input_port_index_manip_plan_msg_ = DeclareAbstractInputPort().get_index();
 
   auto plan_as_value = systems::AbstractValue::Make<GenericPlan<double>>(
-      HumanoidManipulationPlan<double>());
+      HumanoidLocomotionPlan<double>());
   abs_state_index_plan_ = DeclareAbstractState(std::move(plan_as_value));
 }
 
