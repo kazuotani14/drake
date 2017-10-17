@@ -547,8 +547,8 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
   //  Vector3<double> desired_com(0.0075, 0.0, 0.96);
   Vector3<double> desired_com(0.0075, 0.07, 0.96);
   Vector6<double> desired_vdot = input.desired_centroidal_momentum_dot().values();
-  double kp = 50.0;
-  double kd = 70.0;
+  double kp = 500.0;
+  double kd = 700.0;
   Vector3<double> cur_com =  rs.get_com();
   Vector3<double> cur_comv = rs.get_com_velocity();
   desired_vdot[3] = kp*(desired_com[0] - cur_com[0]) + kd*(-cur_comv[0]);
@@ -590,7 +590,7 @@ int QpInverseDynamics::Control(const RobotKinematicState<double>& rs,
 //      std::cout << cur_pos.transpose() << std::endl;
       Vector3<double> desired_pos(0.2, -0.4, 0.77);
       auto body_motion_des = body_motion_d.values();
-      body_motion_des.tail(3) = 150.0 * (desired_pos - cur_pos);
+      body_motion_des.tail(3) = 1500.0 * (desired_pos - cur_pos);
       linear_term = body_Jdv_[body_ctr] - body_motion_des;
     }
     else{
