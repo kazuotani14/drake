@@ -337,7 +337,7 @@ uint64_t robot_plan_custom_t::_computeHash(const __lcm_hash_ptr *p)
     for(fp = p; fp != NULL; fp = fp->parent)
         if(fp->v == robot_plan_custom_t::getHash)
             return 0;
-    const __lcm_hash_ptr cp = { p, (void*)robot_plan_custom_t::getHash };
+    const __lcm_hash_ptr cp = { p, robot_plan_custom_t::getHash };
 
     uint64_t hash = 0xe5217f3a4a278650LL +
          bot_core::robot_state_t::_computeHash(&cp) +

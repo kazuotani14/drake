@@ -7,6 +7,7 @@
 #include "bot_core/atlas_command_t.hpp"
 #include "bot_core/robot_state_t.hpp"
 #include "robotlocomotion/robot_plan_t.hpp"
+#include "drake/examples/humanoid_controller/lcm_custom_types/robotlocomotion/robot_plan_custom_t.hpp"
 
 #include "drake/examples/humanoid_controller/atlas_command_translator_system.h"
 #include "drake/examples/humanoid_controller/humanoid_plan_eval_system.h"
@@ -63,7 +64,7 @@ class HumanoidController : public systems::Diagram<double> {
             "EST_ROBOT_STATE", lcm));
 
     auto plan_subscriber = builder.AddSystem(
-        systems::lcm::LcmSubscriberSystem::Make<robotlocomotion::robot_plan_t>(
+        systems::lcm::LcmSubscriberSystem::Make<robotlocomotion::robot_plan_custom_t>(
             "VALKYRIE_MANIP_PLAN", lcm));
 
     auto atlas_command_publisher = builder.AddSystem(

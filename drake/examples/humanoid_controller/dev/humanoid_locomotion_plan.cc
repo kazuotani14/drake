@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "robotlocomotion/robot_plan_t.hpp"
+#include "drake/examples/humanoid_controller/lcm_custom_types/robotlocomotion/robot_plan_custom_t.hpp"
 
 #include "drake/systems/controllers/qp_inverse_dynamics/lcm_utils.h"
 #include "drake/systems/controllers/setpoint.h"
@@ -95,7 +96,7 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
     const systems::AbstractValue& plan) {
   unused(paramset);
 
-  const auto& msg = plan.GetValueOrThrow<robotlocomotion::robot_plan_t>();
+  const auto& msg = plan.GetValueOrThrow<robotlocomotion::robot_plan_custom_t>();
 
   if (msg.utime == last_handle_plan_time_) return;
 

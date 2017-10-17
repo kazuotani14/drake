@@ -76,6 +76,7 @@ drake_cc_library(
     ],
     hdrs = [
         "dev/humanoid_locomotion_plan.h",
+        "lcm_custom_types/robotlocomotion/robot_plan_custom_t.hpp",
     ],
     deps = [
         "//drake/manipulation/util:robot_state_msg_translator",
@@ -137,6 +138,7 @@ drake_cc_binary(
         "//drake/examples/valkyrie:models",
     ],
     deps = [
+        ":humanoid_locomotion_plan",
         "//drake/common:find_resource",
         "//drake/examples/valkyrie:valkyrie_constants",
         "//drake/manipulation/util:robot_state_msg_translator",
