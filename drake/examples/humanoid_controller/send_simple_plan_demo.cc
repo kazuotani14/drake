@@ -17,9 +17,6 @@
 
 DEFINE_double(com_z, 0.96,
               "Desired center-of-mass height [m]");
-//  q[10] += FLAGS_r_shy_offset;
-
-using std::default_random_engine;
 
 namespace drake {
 namespace examples {

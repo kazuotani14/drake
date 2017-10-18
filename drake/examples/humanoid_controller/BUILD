@@ -90,6 +90,22 @@ drake_cc_library(
 )
 
 drake_cc_library(
+    name = "simple_highlevel_planner",
+    srcs = ["simple_highlevel_planner.cc"],
+    hdrs = [
+        "lcm_custom_types/robotlocomotion/robot_plan_simple_t.hpp",
+        "simple_highlevel_planner.h",
+    ],
+    deps = [
+        ":humanoid_simple_plan",
+        "//drake/examples/valkyrie:valkyrie_constants",
+        "//drake/manipulation/util:robot_state_msg_translator",
+        "//drake/multibody:rigid_body_tree",
+        "//drake/systems/framework:leaf_system",
+    ],
+)
+
+drake_cc_library(
     name = "humanoid_plan_eval_system",
     srcs = ["humanoid_plan_eval_system.cc"],
     hdrs = ["humanoid_plan_eval_system.h"],
@@ -186,6 +202,32 @@ drake_cc_binary(
         "//drake/common:find_resource",
         "//drake/examples/valkyrie:valkyrie_constants",
         "//drake/systems/lcm:lcm_driven_loop",
+    ],
+)
+
+drake_cc_binary(
+    name = "valkyrie_squatting_demo",
+    srcs = [
+        "valkyrie_squatting_demo.cc",
+    ],
+    data = [
+        ":config/valkyrie.alias_groups",
+        ":config/valkyrie.id_controller_config",
+        "//drake/examples/valkyrie:models",
+    ],
+    tags = gurobi_test_tags(),
+    deps = [
+        ":humanoid_simple_plan",
+        ":humanoid_status_translator_system",
+        ":simple_highlevel_planner",
+        "//drake/common:find_resource",
+        "//drake/examples/valkyrie:valkyrie_constants",
+        "//drake/lcm",
+        "//drake/multibody/parsers",
+        "//drake/systems/framework",
+        "//drake/systems/lcm",
+        "//drake/systems/lcm:lcm_driven_loop",
+        "@lcmtypes_bot2_core",
     ],
 )
 
