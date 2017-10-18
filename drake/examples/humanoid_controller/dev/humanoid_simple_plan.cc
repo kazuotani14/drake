@@ -39,7 +39,7 @@ void HumanoidLocomotionPlan<T>::InitializeGenericPlanDerived(
   this->UpdateContactState(double_support);
 
   // Sets body tracking trajectories for pelvis and torso.
-  // TODO (kazu) read these bodies from config file
+  // TODO (kazu) read these bodies from config file?
   // TODO (kazu) find where gains are read
   const std::vector<std::string> tracked_body_names = {"pelvis", "torso", "rightPalm", "leftPalm"};
   MatrixX<T> position;
@@ -47,14 +47,7 @@ void HumanoidLocomotionPlan<T>::InitializeGenericPlanDerived(
     const RigidBody<T>* body = alias_groups.get_body(name);
     Isometry3<T> body_pose = robot_status.get_robot().CalcBodyPoseInWorldFrame(
         robot_status.get_cache(), *body);
-    position = body_pose.translation();
-    PiecewisePolynomial<T> pos_traj =
-        PiecewisePolynomial<T>::ZeroOrderHold(times, {position, position});
-    PiecewiseQuaternionSlerp<T> rot_traj(
-        times, {body_pose.linear(), body_pose.linear()});
-
-    manipulation::PiecewiseCartesianTrajectory<T> body_traj(pos_traj, rot_traj);
-    this->set_body_trajectory(body, body_traj);
+    set_constant_body_trajectory(body_pose, body->get_name(), robot_status, alias_groups);
   }
 }
 
@@ -190,10 +183,25 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
               T>::MakeCubicLinearWithEndLinearVelocity(times, knots,
                                                        Vector3<T>::Zero(),
                                                        Vector3<T>::Zero());
-
       this->set_body_trajectory(body, body_traj);
     }
   }
+}
+
+template <typename T>
+void HumanoidLocomotionPlan<T>::set_constant_body_trajectory(const Isometry3<T>& pose, std::string name,
+ const RobotKinematicState<T>& robot_status, const RigidBodyTreeAliasGroups<T>& alias_groups) {
+ const std::vector<T> times = {robot_status.get_time(),
+                                robot_status.get_time() + 1};
+  const RigidBody<T>* body = alias_groups.get_body(name);
+  MatrixX<T> position = pose.translation();
+  PiecewisePolynomial<T> pos_traj =
+      PiecewisePolynomial<T>::ZeroOrderHold(times, {position, position});
+  PiecewiseQuaternionSlerp<T> rot_traj(
+      times, {pose.linear(), pose.linear()}); // TODO confirm that this is working
+
+  manipulation::PiecewiseCartesianTrajectory<T> body_traj(pos_traj, rot_traj);
+  this->set_body_trajectory(body, body_traj);
 }
 
 template <typename T>

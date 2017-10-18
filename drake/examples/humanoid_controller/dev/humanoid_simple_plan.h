@@ -6,12 +6,15 @@
 #include "drake/systems/controllers/plan_eval/generic_plan.h"
 #include "drake/systems/controllers/zmp_planner.h"
 
+
 namespace drake {
 namespace examples {
 namespace humanoid_controller {
 
+using systems::controllers::qp_inverse_dynamics::RobotKinematicState;
+
 /**
- * A baseline manipulation plan interpretor for a humanoid robot. The plan
+ * A baseline manipulation plan interpreter for a humanoid robot. The plan
  * essentially consists of a sequence of time and generalized positions,
  * which are used to generate splines, which are then used as desired
  * trajectories to populate QpInput for the QPController.
@@ -99,7 +102,7 @@ class HumanoidLocomotionPlan
    *
    * Aborts if assumptions about `T_plan` is not valid.
    *
-   * @throws if @p plan is not of type robotlocomotion::robot_plan_t
+   * @throws if @p plan is not of type robotlocomotion::robot_simple_plan_t
    */
   void HandlePlanGenericPlanDerived(
       const systems::controllers::qp_inverse_dynamics::RobotKinematicState<T>&
@@ -145,6 +148,10 @@ class HumanoidLocomotionPlan
       const systems::controllers::qp_inverse_dynamics::RobotKinematicState<T>&,
       const systems::controllers::qp_inverse_dynamics::ParamSet&,
       const RigidBodyTreeAliasGroups<T>&) override {}
+
+  // Sets a constant "trajectory" to go towards desired
+  void set_constant_body_trajectory(const Isometry3<T>& pose, std::string name,
+                                    const RobotKinematicState<T>& robot_status, const RigidBodyTreeAliasGroups<T>& alias_groups);
 
   int64_t last_handle_plan_time_{-1};
   Vector3<double> com_d_; // TODO (kazu) figure out better place to put this
