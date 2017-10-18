@@ -37,7 +37,7 @@ SimpleHighlevelPlanner::SimpleHighlevelPlanner(const RigidBodyTree<double>* robo
           .get_index();
 
   set_name("HumanoidSimpleHighlevelPlanner");
-  DeclarePeriodicUnrestrictedUpdate(0.5); // TODO remove this?
+  DeclarePeriodicUnrestrictedUpdate(0.2); // TODO remove this?
   abs_state_index_plan_output_ = DeclareAbstractState(
       systems::AbstractValue::Make<robot_plan_simple_t>(robot_plan_simple_t()));
 }

@@ -16,10 +16,12 @@ namespace drake {
 namespace examples {
 namespace humanoid_controller {
 
-/* This assumes that HumanoidController (valkyrie_balancing_demo) is running
+/*
  * The system outputs plans for HumanoidPlanEval, which then sends commands to the QP controller
+ * Assumes that HumanoidController (valkyrie_balancing_demo) is running
+ * Based on valkyrie_balancing_demo code
  */
-void controller_loop() {
+void run_planner() {
   const std::string kModelFileName = FindResourceOrThrow(
       "drake/examples/valkyrie/urdf/urdf/"
           "valkyrie_A_sim_drake_one_neck_dof_wide_ankle_rom.urdf");
@@ -33,25 +35,22 @@ void controller_loop() {
   parsers::urdf::AddModelInstanceFromUrdfFileToWorld(
       kModelFileName, multibody::joints::kRollPitchYaw, &robot);
 
-  // Build diagram with LCM input and output
+  // Build diagram with planner and humanoid status translator
   systems::DiagramBuilder<double> builder;
-  auto simple_planner = builder.AddSystem<simple_highlevel_planner::SimpleHighlevelPlanner>(&robot);
 
+  auto simple_planner = builder.AddSystem<simple_highlevel_planner::SimpleHighlevelPlanner>(&robot);
   RobotStateMsgToHumanoidStatusSystem* msg_to_humanoid_status =
       builder.AddSystem(std::make_unique<RobotStateMsgToHumanoidStatusSystem>(
           &robot, kAliasGroupPath));
 
-  systems::lcm::LcmSubscriberSystem* robot_state_subscriber = builder.AddSystem(
+  // Set up input and output
+  auto robot_state_subscriber = builder.AddSystem(
       systems::lcm::LcmSubscriberSystem::Make<bot_core::robot_state_t>(
           "EST_ROBOT_STATE", &lcm));
-  const systems::lcm::LcmSubscriberSystem& state_msg_subscriber =
-      *robot_state_subscriber;
-
   auto plan_publisher = builder.AddSystem(
       systems::lcm::LcmPublisherSystem::Make<robotlocomotion::robot_plan_simple_t>(
           "VALKYRIE_MANIP_PLAN", &lcm));
 
-  // TODO add connections
   // lcm -> robot state
   builder.Connect(robot_state_subscriber->get_output_port(0),
                   msg_to_humanoid_status->get_input_port());
@@ -64,9 +63,9 @@ void controller_loop() {
 
   auto diagram = builder.Build();
 
-  // Makes a Lcm driven loop that's blocked by robot_state_subscriber.
+  // Make a Lcm driven loop that's blocked by robot_state_subscriber.
   systems::lcm::LcmDrivenLoop loop(
-      *diagram, state_msg_subscriber, nullptr, &lcm,
+      *diagram, *robot_state_subscriber, nullptr, &lcm,
       std::make_unique<
           systems::lcm::UtimeMessageToSeconds<bot_core::robot_state_t>>());
 
@@ -79,5 +78,5 @@ void controller_loop() {
 }  // end namespace drake
 
 int main() {
-  drake::examples::humanoid_controller::controller_loop();
+  drake::examples::humanoid_controller::run_planner();
 }
