@@ -30,17 +30,6 @@ void HumanoidLocomotionPlan<T>::InitializeGenericPlanDerived(
   const std::vector<T> times = {robot_status.get_time(),
                                 robot_status.get_time() + 1};
 
-  // Current com q and v.
-  Vector4<T> xcom;
-  xcom << robot_status.get_com().template head<2>(),
-      robot_status.get_com_velocity().template head<2>();
-  // Set desired com q to current.
-  MatrixX<T> com_d = robot_status.get_com().template head<2>();
-  PiecewisePolynomial<T> zmp_d =
-      PiecewisePolynomial<T>::ZeroOrderHold(times, {com_d, com_d});
-  // Makes a zmp planner that stays still.
-  zmp_planner_.Plan(zmp_d, xcom, zmp_height_);
-
   com_d_ = robot_status.get_com();
 
   // Assumes double support with both feet.
@@ -76,7 +65,6 @@ void HumanoidLocomotionPlan<T>::UpdateQpInputGenericPlanDerived(
   unused(paramset, alias_groups);
 
   // TODO get gains from paramset
-//  Vector3<double> kp_com {40.0, 40.0, 20.0};
   Vector3<double> kp_com {20.0, 20.0, 40.0};
   Vector3<double> kd_com {12.0, 12.0, 10.0};
   Vector3<T> comdd_d = kp_com.cwiseProduct(com_d_ - robot_status.get_com()) +
@@ -133,8 +121,6 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
     body_knots[body] = std::vector<Isometry3<T>>(
         1, this->get_body_trajectory(body).get_pose(time_now));
   }
-  std::vector<T> com_times(1, time_now);
-  std::vector<MatrixX<T>> com_knots(1, zmp_planner_.get_nominal_com(time_now));
 
   const manipulation::RobotStateLcmMessageTranslator translator(
       robot_status.get_robot());
@@ -156,7 +142,6 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
     robot.doKinematics(cache, false);
 
     times.push_back(time_now + time);
-    com_times.push_back(time_now + time);
     dof_knots.push_back(q);
 
     for (auto& body_knots_pair : body_knots) {
@@ -184,6 +169,7 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
       const auto& des_pose = desired_body_poses[com_idx].body_pose;
       com_d_ = {des_pose.pos[0], des_pose.pos[1], des_pose.pos[2]};
     }
+    std::cout << "com_d: " << com_d_.transpose() << std::endl;
   }
 
   // Generates dof trajectories.

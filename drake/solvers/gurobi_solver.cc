@@ -495,6 +495,7 @@ int ProcessLinearConstraints(GRBmodel* model, MathematicalProgram& prog,
   for (const auto& binding : prog.linear_equality_constraints()) {
     const auto& constraint = binding.constraint();
 
+//    std::cout << "Adding linear eq constraint: " << constraint->get_description() << std::endl;
     const int error = AddLinearConstraint(
         prog, model, constraint->A(), constraint->lower_bound(),
         constraint->upper_bound(), binding.variables(), true,
@@ -507,6 +508,7 @@ int ProcessLinearConstraints(GRBmodel* model, MathematicalProgram& prog,
   for (const auto& binding : prog.linear_constraints()) {
     const auto& constraint = binding.constraint();
 
+//    std::cout << "Adding linear ineq constraint: " << constraint->get_description() << std::endl;
     const int error = AddLinearConstraint(
         prog, model, constraint->A(), constraint->lower_bound(),
         constraint->upper_bound(), binding.variables(), false,

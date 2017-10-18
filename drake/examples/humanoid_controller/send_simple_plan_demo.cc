@@ -61,6 +61,13 @@ void send_manip_message() {
   msg.plan.resize(msg.num_states);
   msg.plan_info.resize(msg.num_states, 1);
 
+  // Set desired body poses, independent of joint configuration
+  // `body_name` can be: com, rightPalm, leftPalm, pelvis, torso
+  //   To add to this list, you need to add them to a few places:
+  //    * humanoid_simple_plan.cc
+  //    * some config files
+  //    * valkyrie.id_controller_config (gains, weights)
+  // Set the desired pose in world coordinates
   msg.num_body_poses = 2;
   msg.desired_poses.resize(msg.num_body_poses);
 
@@ -71,13 +78,13 @@ void send_manip_message() {
   com_pose_des.pos[2] = FLAGS_com_z; //0.962;
   msg.desired_poses[0].body_pose = com_pose_des;
 
-//  msg.desired_poses[1].body_name = "rightPalm";
-//  bot_core::pose_t righthand_pose_des;
-//  righthand_pose_des.pos[0] = 0.43;
-//  righthand_pose_des.pos[1] = -0.38;
-//  righthand_pose_des.pos[2] = 0.94;
-//  msg.desired_poses[0].body_pose = righthand_pose_des;
-//
+  msg.desired_poses[1].body_name = "rightPalm";
+  bot_core::pose_t righthand_pose_des;
+  righthand_pose_des.pos[0] = 0.43;
+  righthand_pose_des.pos[1] = -0.38;
+  righthand_pose_des.pos[2] = 0.94;
+  msg.desired_poses[1].body_pose = righthand_pose_des;
+
 //  msg.desired_poses[2].body_name = "leftPalm";
 //  bot_core::pose_t lefthand_pose_des;
 //  lefthand_pose_des.pos[0] = 0.43;

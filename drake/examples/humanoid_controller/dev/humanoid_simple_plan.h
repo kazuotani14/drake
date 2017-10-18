@@ -29,18 +29,6 @@ class HumanoidLocomotionPlan
   HumanoidLocomotionPlan() {}
 
   /**
-   * Returns the center of mass height used in the ZMP planner.
-   * @see ZMPPlanner::Plan for more details.
-   */
-  double get_zmp_height() const { return zmp_height_; }
-
-  /**
-   * Sets the center of mass height used in the ZMP planner to @p z.
-   * @see ZMPPlanner::Plan for more details.
-   */
-  void set_zmp_height(double z) { zmp_height_ = z; }
-
-  /**
    * Returns true if @p robot has at least 2 rigid bodies; the first rigid body
    * has a RPY parametrized floating joint, and it has the same number of
    * generalized positions and velocities.
@@ -158,8 +146,6 @@ class HumanoidLocomotionPlan
       const systems::controllers::qp_inverse_dynamics::ParamSet&,
       const RigidBodyTreeAliasGroups<T>&) override {}
 
-  systems::controllers::ZMPPlanner zmp_planner_;
-  double zmp_height_{1.0};
   int64_t last_handle_plan_time_{-1};
   Vector3<double> com_d_; // TODO (kazu) figure out better place to put this
 };
