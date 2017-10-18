@@ -70,13 +70,13 @@ drake_cc_library(
 )
 
 drake_cc_library(
-    name = "humanoid_locomotion_plan",
+    name = "humanoid_simple_plan",
     srcs = [
-        "dev/humanoid_locomotion_plan.cc",
+        "dev/humanoid_simple_plan.cc",
     ],
     hdrs = [
-        "dev/humanoid_locomotion_plan.h",
-        "lcm_custom_types/robotlocomotion/robot_plan_custom_t.hpp",
+        "dev/humanoid_simple_plan.h",
+        "lcm_custom_types/robotlocomotion/robot_plan_simple_t.hpp",
     ],
     deps = [
         "//drake/manipulation/util:robot_state_msg_translator",
@@ -94,8 +94,8 @@ drake_cc_library(
     srcs = ["humanoid_plan_eval_system.cc"],
     hdrs = ["humanoid_plan_eval_system.h"],
     deps = [
-        ":humanoid_locomotion_plan",
         ":humanoid_manipulation_plan",
+        ":humanoid_simple_plan",
         "//drake/systems/controllers/plan_eval:plan_eval_base_system",
     ],
 )
@@ -150,15 +150,15 @@ drake_cc_binary(
 )
 
 drake_cc_binary(
-    name = "send_locomotion_plan_demo",
+    name = "send_simple_plan_demo",
     srcs = [
-        "send_locomotion_plan_demo.cc",
+        "send_simple_plan_demo.cc",
     ],
     data = [
         "//drake/examples/valkyrie:models",
     ],
     deps = [
-        ":humanoid_locomotion_plan",
+        ":humanoid_simple_plan",
         "//drake/common:find_resource",
         "//drake/examples/valkyrie:valkyrie_constants",
         "//drake/manipulation/util:robot_state_msg_translator",

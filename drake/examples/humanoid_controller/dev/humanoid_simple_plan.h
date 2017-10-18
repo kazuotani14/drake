@@ -161,6 +161,7 @@ class HumanoidLocomotionPlan
   systems::controllers::ZMPPlanner zmp_planner_;
   double zmp_height_{1.0};
   int64_t last_handle_plan_time_{-1};
+  Vector3<double> com_d_; // TODO (kazu) figure out better place to put this
 };
 
 }  // namespace humanoid_controller

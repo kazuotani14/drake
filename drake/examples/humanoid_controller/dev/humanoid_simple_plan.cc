@@ -1,4 +1,4 @@
-#include "drake/examples/humanoid_controller/dev/humanoid_locomotion_plan.h"
+#include "drake/examples/humanoid_controller/dev/humanoid_simple_plan.h"
 
 #include <string>
 #include <unordered_map>
@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #include "robotlocomotion/robot_plan_t.hpp"
-#include "drake/examples/humanoid_controller/lcm_custom_types/robotlocomotion/robot_plan_custom_t.hpp"
+#include "drake/examples/humanoid_controller/lcm_custom_types/robotlocomotion/robot_plan_simple_t.hpp"
 
 #include "drake/systems/controllers/qp_inverse_dynamics/lcm_utils.h"
 #include "drake/systems/controllers/setpoint.h"
@@ -41,6 +41,8 @@ void HumanoidLocomotionPlan<T>::InitializeGenericPlanDerived(
   // Makes a zmp planner that stays still.
   zmp_planner_.Plan(zmp_d, xcom, zmp_height_);
 
+  com_d_ = robot_status.get_com();
+
   // Assumes double support with both feet.
   ContactState double_support;
   double_support.insert(alias_groups.get_body("left_foot"));
@@ -73,12 +75,12 @@ void HumanoidLocomotionPlan<T>::UpdateQpInputGenericPlanDerived(
     const RigidBodyTreeAliasGroups<T>& alias_groups, QpInput* qp_input) const {
   unused(paramset, alias_groups);
 
-  // Generates CoM acceleration.
-  Vector4<T> xcom;
-  xcom << robot_status.get_com().template head<2>(),
-      robot_status.get_com_velocity().template head<2>();
-  Vector2<T> comdd_d =
-      zmp_planner_.ComputeOptimalCoMdd(robot_status.get_time(), xcom);
+  // TODO get gains from paramset
+//  Vector3<double> kp_com {40.0, 40.0, 20.0};
+  Vector3<double> kp_com {20.0, 20.0, 40.0};
+  Vector3<double> kd_com {12.0, 12.0, 10.0};
+  Vector3<T> comdd_d = kp_com.cwiseProduct(com_d_ - robot_status.get_com()) +
+      kd_com.cwiseProduct(Vector3<T>::Zero(3) - robot_status.get_com_velocity());
 
   // Zeros linear and angular momentum change.
   qp_input->mutable_desired_centroidal_momentum_dot()
@@ -87,7 +89,7 @@ void HumanoidLocomotionPlan<T>::UpdateQpInputGenericPlanDerived(
   // Only sets the xy dimensions of the linear momentum change.
   qp_input->mutable_desired_centroidal_momentum_dot()
       .mutable_values()
-      .segment<2>(3) = robot_status.get_robot().getMass() * comdd_d;
+      .segment<3>(3) = robot_status.get_robot().getMass() * comdd_d;
 }
 
 template <typename T>
@@ -97,7 +99,7 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
     const systems::AbstractValue& plan) {
   unused(paramset);
 
-  const auto& msg = plan.GetValueOrThrow<robotlocomotion::robot_plan_custom_t>();
+  const auto& msg = plan.GetValueOrThrow<robotlocomotion::robot_plan_simple_t>();
 
   if (msg.utime == last_handle_plan_time_) return;
 
@@ -137,8 +139,14 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
   const manipulation::RobotStateLcmMessageTranslator translator(
       robot_status.get_robot());
 
-  const auto& body_names = msg.body_names;
-  const auto& body_des_poses = msg.body_pose_des;
+  const auto& desired_body_poses = msg.desired_poses;
+  auto find_desired_body_pose = [&](std::string name) {
+    for(int i=0; i< static_cast<int>(desired_body_poses.size()); ++i){
+      if(desired_body_poses[i].body_name == name) return i;
+    }
+    return -1;
+  };
+
 
   for (const bot_core::robot_state_t& keyframe : msg.plan) {
     translator.DecodeMessageKinematics(keyframe, q, v);
@@ -156,11 +164,10 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
       Isometry3<double> desired_transform;
       std::vector<Isometry3<T>>& knots = body_knots_pair.second;
 
-      auto bodyname_itr = std::find(body_names.begin(), body_names.end(), body->get_name());
-      if(bodyname_itr != body_names.end()) {
+      int found_idx = find_desired_body_pose(body->get_name());
+      if(found_idx != -1) {
         std::cout << body->get_name() << std::endl;
-        int idx = bodyname_itr - body_names.begin();
-        const auto& des_pose = body_des_poses[idx];
+        const auto& des_pose = desired_body_poses[found_idx].body_pose;
         Vector3<double> desired_pos(des_pose.pos[0], des_pose.pos[1], des_pose.pos[2]);
         desired_transform.translate(desired_pos);
       }
@@ -171,32 +178,12 @@ void HumanoidLocomotionPlan<T>::HandlePlanGenericPlanDerived(
     }
 
     // Computes com.
-    Vector2<double> desired_com = robot.centerOfMass(cache).template head<2>();
-    for(int i=0; i<msg.num_body_poses; ++i) {
-      std::string name = body_names[i];
-      if(name == "com") {
-        const auto& des_pose = body_des_poses[i];
-        desired_com = {des_pose.pos[0], des_pose.pos[1]};
-      }
+    com_d_ = robot.centerOfMass(cache);
+    int com_idx = find_desired_body_pose("com");
+    if(com_idx != -1) {
+      const auto& des_pose = desired_body_poses[com_idx].body_pose;
+      com_d_ = {des_pose.pos[0], des_pose.pos[1], des_pose.pos[2]};
     }
-    com_knots.push_back(desired_com);
-//    com_knots.push_back(robot.centerOfMass(cache).template head<2>());
-  }
-
-  // Generates the zmp trajectory.
-  {
-    // CoM has 1 more knot point to ensure the trajectory ends at zero velocity.
-    // TODO(siyuan): have the zmp planner deal with this.
-    // Repeats the last desired CoM position to ensure CoM trajectory ends in
-    // zero velocity.
-    com_times.push_back(com_times.back() + 0.1);
-    com_knots.push_back(com_knots.back());
-    PiecewisePolynomial<T> zmp_poly =
-        PiecewisePolynomial<T>::Pchip(com_times, com_knots, true);
-    Vector4<T> x_com0;
-    x_com0 << robot_status.get_com().template head<2>(),
-        robot_status.get_com_velocity().template head<2>();
-    zmp_planner_.Plan(zmp_poly, x_com0, zmp_height_);
   }
 
   // Generates dof trajectories.

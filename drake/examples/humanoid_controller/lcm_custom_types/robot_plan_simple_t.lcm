@@ -1,6 +1,12 @@
 package robotlocomotion;
 
-struct robot_plan_custom_t
+struct desired_body_pose_t
+{
+  string body_name;
+  bot_core.pose_t body_pose;
+}
+
+struct robot_plan_simple_t
 {
   int64_t utime;
   string robot_name;
@@ -11,8 +17,7 @@ struct robot_plan_custom_t
   // Force some com/link pose tasks
   // Need to adjust gains and weights for controlled quantities in config file
   int32_t num_body_poses; // number of desired poses
-  string body_names[num_body_poses]; // "com", "rightPalm", "leftPalm" TODO add feet
-  bot_core.pose_t body_pose_des[num_body_poses]; // see pose_t for how to set. will set everything manually for now
+  desired_body_pose_t desired_poses[num_body_poses];
 
   // Decoupling hand states from robot state as atlas api deals with them separately.
   // Also drake expects robot joints excluding hand joints.

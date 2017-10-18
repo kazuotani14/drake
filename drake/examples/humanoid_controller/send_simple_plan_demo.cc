@@ -1,5 +1,5 @@
 /**
- * @brief This is a demo program that sends a full body manipulation plan
+ * @brief This is a demo program that sends a motion plan to the Valkyrie
  * encoded as a robotlocomotion::robot_plan_t to ValkyrieController. The plan
  * has most of the joints set to the nominal configuration except the right
  * shoulder joint, which can be commanded from a single command line argument.
@@ -7,7 +7,7 @@
 #include <gflags/gflags.h>
 #include "lcm/lcm-cpp.hpp"
 #include "robotlocomotion/robot_plan_t.hpp"
-#include "drake/examples/humanoid_controller/lcm_custom_types/robotlocomotion/robot_plan_custom_t.hpp"
+#include "drake/examples/humanoid_controller/lcm_custom_types/robotlocomotion/robot_plan_simple_t.hpp"
 
 #include "drake/examples/valkyrie/valkyrie_constants.h"
 #include "drake/manipulation/util/robot_state_msg_translator.h"
@@ -15,8 +15,8 @@
 #include "drake/multibody/parsers/urdf_parser.h"
 #include "drake/multibody/rigid_body_tree.h"
 
-//DEFINE_double(r_shy_offset, 0,
-//              "Right shoulder pitch offset [rad].");
+DEFINE_double(com_z, 0.96,
+              "Desired center-of-mass height [m]");
 //  q[10] += FLAGS_r_shy_offset;
 
 using std::default_random_engine;
@@ -55,34 +55,35 @@ void send_manip_message() {
   // mode (These can be changed by the gains in the configuration file). CoM
   // is controlled by a LQR like controller, where the desired is given by the
   // knot points specified here.
-  robotlocomotion::robot_plan_custom_t msg{};
+  robotlocomotion::robot_plan_simple_t msg{};
   msg.utime = time(NULL);
   msg.num_states = 1;
   msg.plan.resize(msg.num_states);
   msg.plan_info.resize(msg.num_states, 1);
 
-  msg.num_body_poses = 3;
-  msg.body_names.resize(msg.num_body_poses);
-  msg.body_pose_des.resize(msg.num_body_poses);
-  msg.body_names[0] = "com";
+  msg.num_body_poses = 2;
+  msg.desired_poses.resize(msg.num_body_poses);
+
+  msg.desired_poses[0].body_name = "com";
   bot_core::pose_t com_pose_des;
   com_pose_des.pos[0] = 0.0;
-  com_pose_des.pos[1] = 0.07;
-  msg.body_pose_des[0] = com_pose_des;
+  com_pose_des.pos[1] = 0.0; // 0.07;
+  com_pose_des.pos[2] = FLAGS_com_z; //0.962;
+  msg.desired_poses[0].body_pose = com_pose_des;
 
-  msg.body_names[1] = "rightPalm";
-  bot_core::pose_t righthand_pose_des;
-  righthand_pose_des.pos[0] = 0.43;
-  righthand_pose_des.pos[1] = -0.38;
-  righthand_pose_des.pos[2] = 0.94;
-  msg.body_pose_des[1] = righthand_pose_des;
-
-  msg.body_names[2] = "leftPalm";
-  bot_core::pose_t lefthand_pose_des;
-  lefthand_pose_des.pos[0] = 0.43;
-  lefthand_pose_des.pos[1] = 0.38;
-  lefthand_pose_des.pos[2] = 0.94;
-  msg.body_pose_des[2] = lefthand_pose_des;
+//  msg.desired_poses[1].body_name = "rightPalm";
+//  bot_core::pose_t righthand_pose_des;
+//  righthand_pose_des.pos[0] = 0.43;
+//  righthand_pose_des.pos[1] = -0.38;
+//  righthand_pose_des.pos[2] = 0.94;
+//  msg.desired_poses[0].body_pose = righthand_pose_des;
+//
+//  msg.desired_poses[2].body_name = "leftPalm";
+//  bot_core::pose_t lefthand_pose_des;
+//  lefthand_pose_des.pos[0] = 0.43;
+//  lefthand_pose_des.pos[1] = 0.38;
+//  lefthand_pose_des.pos[2] = 0.94;
+//  msg.desired_poses[2].body_pose = lefthand_pose_des;
 
   translator.InitializeMessage(&(msg.plan[0]));
   translator.EncodeMessageKinematics(q, v, &(msg.plan[0]));

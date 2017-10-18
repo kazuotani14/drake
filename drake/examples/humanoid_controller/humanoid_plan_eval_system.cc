@@ -7,8 +7,8 @@
 
 #include "robotlocomotion/robot_plan_t.hpp"
 
-#include "drake/examples/humanoid_controller/dev/humanoid_manipulation_plan.h"
-#include "drake/examples/humanoid_controller/dev/humanoid_locomotion_plan.h"
+//#include "drake/examples/humanoid_controller/dev/humanoid_manipulation_plan.h"
+#include "drake/examples/humanoid_controller/dev/humanoid_simple_plan.h"
 
 namespace drake {
 namespace examples {
