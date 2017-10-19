@@ -1,5 +1,6 @@
 #include "drake/examples/humanoid_controller/simple_highlevel_planner.h"
 
+#include <cmath>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -50,7 +51,6 @@ void SimpleHighlevelPlanner::CopyOutPlanOutput(
   plan_output = context.get_abstract_state<robot_plan_simple_t>(abs_state_index_plan_output_);
 }
 
-// TODO get this working
 void SimpleHighlevelPlanner::DoCalcUnrestrictedUpdate(
     const systems::Context<double>& context,
     const std::vector<const systems::UnrestrictedUpdateEvent<double>*>&,
@@ -73,22 +73,20 @@ void SimpleHighlevelPlanner::DoCalcUnrestrictedUpdate(
   msg.plan.resize(msg.num_states);
   msg.plan_info.resize(msg.num_states, 1);
 
+  // Add desired body/CoM poses
   msg.num_body_poses = 1;
   msg.desired_poses.resize(msg.num_body_poses);
 
-  double com_z_d;
-  if(rs->get_com()[2] < 0.83) {
-    com_z_d = 0.96;
-  }
-  else {
-    com_z_d = 0.8;
-  }
+  if(std::abs(rs->get_com()[2]-0.8) < 0.1)
+    com_z_d_ = 0.96;
+  else if(std::abs(rs->get_com()[2]-0.96) < 0.1)
+    com_z_d_ = 0.8;
 
   msg.desired_poses[0].body_name = "com";
   bot_core::pose_t com_pose_des;
   com_pose_des.pos[0] = 0.0;
   com_pose_des.pos[1] = 0.0; // 0.07;
-  com_pose_des.pos[2] = com_z_d; //0.962;
+  com_pose_des.pos[2] = com_z_d_; //0.962;
   msg.desired_poses[0].body_pose = com_pose_des;
 
 //  msg.desired_poses[1].body_name = "rightPalm";

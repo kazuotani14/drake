@@ -58,6 +58,7 @@ class SimpleHighlevelPlanner : public systems::LeafSystem<double> {
                        robot_plan_simple_t* output) const;
 
   const RigidBodyTree<double>& robot_;
+  mutable double com_z_d_ {0.96};
 
   int input_port_index_kinematic_state_{0};
   int output_port_index_plan_output_{0};
