@@ -299,3 +299,4 @@ xcode
 /drake/examples/human_model/models/meshes/visual/obj/icub_waist.mtl
 /drake/examples/human_model/models/meshes/visual/obj/icub_waist.obj
 /drake/examples/human_model/models/icub/icub_with_transmission.urdf
+/drake/examples/human_model/icub_description/
