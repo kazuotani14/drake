@@ -35,6 +35,12 @@ To run the demo: (assuming in drake's root directory)
 
     `$ ./bazel-bin/drake/examples/valkyrie/valkyrie_simulation`
 
+NEW COMMAND (with tasks)
+4. Send CoM and end effector "position tasks"
+    `$ ./bazel-bin/drake/examples/humanoid_controller/valkyrie_squatting_demo`
+     See the code to see how the goal positions are set.
+
+OLD COMMAND
 4. Execute a dummy manipulation plan:
 
     `$ ./bazel-bin/drake/examples/humanoid_controller/send_manipulation_plan_demo -r_shy_offset -1`
