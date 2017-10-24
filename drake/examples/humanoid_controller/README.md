@@ -27,7 +27,7 @@ To run the demo: (assuming in drake's root directory)
 
     `$ ./bazel-bin/tools/drake_visualizer`
 
-2. Start the controller before the simulator:
+2. Start the QP controller before the simulator. By default, it maintains the configuration that it started in.
 
     `$ ./bazel-bin/drake/examples/humanoid_controller/valkyrie_balancing_demo`
 
@@ -36,11 +36,14 @@ To run the demo: (assuming in drake's root directory)
     `$ ./bazel-bin/drake/examples/valkyrie/valkyrie_simulation`
 
 NEW COMMAND (with tasks)
-4. Send CoM and end effector "position tasks"
+
+4. Send CoM and end effector "position tasks". See the code to see how the goal positions are set, and how the high level planner reacts to the robot's state.
+
     `$ ./bazel-bin/drake/examples/humanoid_controller/valkyrie_squatting_demo`
-     See the code to see how the goal positions are set.
+
 
 OLD COMMAND
+
 4. Execute a dummy manipulation plan:
 
     `$ ./bazel-bin/drake/examples/humanoid_controller/send_manipulation_plan_demo -r_shy_offset -1`
