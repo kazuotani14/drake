@@ -37,7 +37,7 @@ To run the demo: (assuming in drake's root directory)
 
 NEW COMMAND (with tasks)
 
-4. Send CoM and end effector "position tasks". See the code to see how the goal positions are set, and how the high level planner reacts to the robot's state.
+4. Send CoM and end effector "position tasks". See the code in `simple_highlevel_planer.cc` to see how the goal positions are set, and how the high level planner reacts to the robot's state.
 
     `$ ./bazel-bin/drake/examples/humanoid_controller/valkyrie_squatting_demo`
 
