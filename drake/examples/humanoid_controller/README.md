@@ -35,7 +35,7 @@ To run the demo: (assuming in drake's root directory)
 
     `$ ./bazel-bin/drake/examples/valkyrie/valkyrie_simulation`
 
-NEW COMMAND (with tasks)
+NEW COMMAND (with tasks - kazu)
 
 4. Send CoM and end effector "position tasks". See the code in `simple_highlevel_planer.cc` to see how the goal positions are set, and how the high level planner reacts to the robot's state.
 
@@ -50,3 +50,11 @@ OLD COMMAND
 
 Note that you can repeatedly send new plans, the controller will start executing
 the new plan as soon as it receives it.
+
+To-do
+
+* add orientation to desired pose
+* get CoM gains from paramset instead of hard-coded
+* make contact sets and tracking bodies come from plan msg
+* clean stuff up - figure out better organization
+* remove all mentions of trajectories?
